@@ -3,604 +3,445 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bypasser</title>
+    <title>Tools</title>
     <style>
-        *, *::before, *::after {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
-            background: #000000;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #000;
+            font-family: Arial, Helvetica, sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        .particles {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 50%;
-            animation: drift linear infinite;
-        }
-
-        @keyframes drift {
-            0% {
-                transform: translateY(100vh) translateX(0) scale(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) translateX(100px) scale(1);
-                opacity: 0;
-            }
-        }
-
-        .wrapper {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 480px;
             padding: 20px;
         }
-
-        .card {
-            background: #080808;
+        .box {
+            background: #0a0a0a;
             border: 1px solid #1a1a1a;
-            border-radius: 24px;
-            padding: 40px 32px;
-            box-shadow: 0 0 80px rgba(0, 0, 0, 0.8), 0 0 200px rgba(0, 0, 0, 0.4);
-            transition: border-color 0.3s ease;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            overflow: hidden;
         }
-
-        .card:focus-within {
-            border-color: #2a2a2a;
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #1a1a1a;
         }
-
-        .lock-icon {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto 28px;
+        .tabs button {
+            flex: 1;
+            padding: 14px 10px;
+            background: #050505;
+            border: none;
+            color: #444;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tabs button.active {
+            color: #ccc;
+            background: #0a0a0a;
+            border-bottom: 2px solid #555;
+        }
+        .tabs button:hover {
+            color: #888;
+        }
+        .tab-content {
+            padding: 35px 30px;
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 25px;
             border: 1px solid #1a1a1a;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #0a0a0a;
         }
-
-        .lock-icon svg {
-            width: 24px;
-            height: 24px;
+        .icon svg {
+            width: 22px;
+            height: 22px;
             stroke: #555;
             fill: none;
             stroke-width: 1.5;
         }
-
         h1 {
             text-align: center;
-            color: #e0e0e0;
-            font-size: 21px;
-            font-weight: 500;
-            letter-spacing: -0.3px;
-            margin-bottom: 6px;
+            color: #ccc;
+            font-size: 20px;
+            font-weight: normal;
+            margin-bottom: 5px;
         }
-
         .sub {
             text-align: center;
-            color: #404040;
-            font-size: 13px;
-            margin-bottom: 32px;
-            letter-spacing: 0.2px;
+            color: #333;
+            font-size: 12px;
+            margin-bottom: 28px;
         }
-
-        .field {
-            position: relative;
-            margin-bottom: 14px;
-        }
-
-        .field input {
+        input, textarea {
             width: 100%;
-            padding: 15px 48px 15px 18px;
+            padding: 14px 15px;
             background: #0d0d0d;
             border: 1px solid #1a1a1a;
-            border-radius: 14px;
-            font-size: 14.5px;
-            color: #e0e0e0;
-            transition: all 0.25s ease;
-            letter-spacing: 0.2px;
-        }
-
-        .field input::placeholder {
-            color: #333;
-        }
-
-        .field input:focus {
+            border-radius: 12px;
+            font-size: 14px;
+            color: #ccc;
             outline: none;
-            border-color: #333;
-            background: #0f0f0f;
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.02);
+            margin-bottom: 12px;
+            font-family: 'Courier New', monospace;
         }
-
-        .field .clear {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
+        textarea {
+            min-height: 200px;
+            max-height: 350px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        input::placeholder, textarea::placeholder {
             color: #333;
-            cursor: pointer;
-            padding: 8px;
-            display: none;
-            transition: color 0.2s;
         }
-
-        .field .clear:hover {
-            color: #666;
+        input:focus, textarea:focus {
+            border-color: #333;
         }
-
-        .field .clear.show {
-            display: block;
-        }
-
         .btn {
             width: 100%;
-            padding: 15px;
-            background: #0f0f0f;
+            padding: 14px;
+            background: #111;
             border: 1px solid #1a1a1a;
-            border-radius: 14px;
-            color: #999;
-            font-size: 15px;
-            font-weight: 500;
+            border-radius: 12px;
+            color: #888;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.25s ease;
-            letter-spacing: 0.3px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
         }
-
         .btn:hover {
-            background: #141414;
-            border-color: #2a2a2a;
+            background: #161616;
             color: #fff;
         }
-
         .btn:disabled {
             opacity: 0.4;
-            cursor: not-allowed;
-            pointer-events: none;
+            cursor: default;
         }
-
-        .dots {
+        .loading {
             display: none;
-            justify-content: center;
-            gap: 5px;
-            margin: 18px 0;
+            text-align: center;
+            color: #333;
+            font-size: 12px;
+            margin-bottom: 15px;
         }
-
-        .dots.show {
-            display: flex;
+        .loading.show {
+            display: block;
         }
-
-        .dots span {
-            width: 5px;
-            height: 5px;
-            background: #222;
-            border-radius: 50%;
-            animation: bounce 1.2s infinite ease-in-out;
-        }
-
-        .dots span:nth-child(2) { animation-delay: 0.2s; }
-        .dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0.4); opacity: 0.3; }
-            40% { transform: scale(1); opacity: 0.8; }
-        }
-
         .error {
-            margin-top: 14px;
-            padding: 12px 16px;
-            background: rgba(255, 40, 40, 0.04);
-            border: 1px solid rgba(255, 40, 40, 0.08);
-            border-radius: 12px;
-            color: #994444;
-            font-size: 13px;
             display: none;
-            animation: fadeUp 0.25s ease;
+            padding: 12px;
+            background: #0a0000;
+            border: 1px solid #1a0000;
+            border-radius: 10px;
+            color: #944;
+            font-size: 13px;
+            margin-bottom: 15px;
         }
-
         .error.show {
             display: block;
         }
-
         .result {
-            margin-top: 14px;
-            padding: 18px;
+            display: none;
+            padding: 15px;
             background: #0a0a0a;
             border: 1px solid #1a1a1a;
-            border-radius: 14px;
-            display: none;
-            animation: fadeUp 0.25s ease;
+            border-radius: 10px;
         }
-
         .result.show {
             display: block;
         }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .result .link {
-            color: #999;
-            font-size: 13.5px;
+        .result .out {
+            color: #888;
+            font-size: 13px;
             word-break: break-all;
-            margin-bottom: 14px;
-            line-height: 1.6;
-            max-height: 120px;
+            margin-bottom: 12px;
+            max-height: 220px;
             overflow-y: auto;
-            padding-right: 6px;
-            font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
-            letter-spacing: 0.1px;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            background: #050505;
+            padding: 12px;
+            border-radius: 8px;
         }
-
-        .result .link::-webkit-scrollbar {
+        .result .out::-webkit-scrollbar {
             width: 3px;
         }
-
-        .result .link::-webkit-scrollbar-track {
+        .result .out::-webkit-scrollbar-track {
             background: transparent;
         }
-
-        .result .link::-webkit-scrollbar-thumb {
+        .result .out::-webkit-scrollbar-thumb {
             background: #1a1a1a;
             border-radius: 3px;
         }
-
-        .result .actions {
+        .result .btns {
             display: flex;
             gap: 8px;
         }
-
-        .result .actions button {
+        .result .btns button {
             flex: 1;
-            padding: 12px;
-            background: #0f0f0f;
-            border: 1px solid #1a1a1a;
-            border-radius: 10px;
-            color: #777;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            letter-spacing: 0.2px;
+            padding: 11px;
+            font-size: 12px;
+            margin-bottom: 0;
         }
-
-        .result .actions button:hover {
-            background: #141414;
-            border-color: #2a2a2a;
-            color: #fff;
-        }
-
-        .result .actions .copy-btn {
-            background: #111;
-        }
-
-        .result .actions .copy-btn.copied {
-            border-color: #1a3a1a;
-            color: #4a4;
-        }
-
-        .result .actions .open-btn {
-            background: #0f0f0f;
-        }
-
-        @media (max-width: 520px) {
-            .card {
-                padding: 32px 20px;
-                border-radius: 20px;
-            }
-            h1 { font-size: 19px; }
-            .sub { font-size: 12px; }
+        .copied {
+            border-color: #1a3a1a !important;
+            color: #4a4 !important;
         }
     </style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
+    <div class="box">
+        <div class="tabs">
+            <button class="active" onclick="switchTab('bypass')">Bypass</button>
+            <button onclick="switchTab('obfuscator')">Lua Obfuscator</button>
+        </div>
 
-    <div class="wrapper">
-        <div class="card">
-            <div class="lock-icon">
+        <!-- BYPASS -->
+        <div class="tab-content active" id="tab-bypass">
+            <div class="icon">
+                <svg viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/>
+                </svg>
+            </div>
+            <h1>Link Bypasser</h1>
+            <p class="sub">Paste your link to get started</p>
+            <input type="text" id="bpUrl" placeholder="Paste link here..." autocomplete="off">
+            <button class="btn" id="bpBtn">Bypass</button>
+            <div class="loading" id="bpLoad">Processing...</div>
+            <div class="error" id="bpErr"></div>
+            <div class="result" id="bpOut">
+                <div class="out" id="bpResult"></div>
+                <div class="btns">
+                    <button id="bpCopy">Copy</button>
+                    <button id="bpOpen">Open</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LUA OBFUSCATOR -->
+        <div class="tab-content" id="tab-obfuscator">
+            <div class="icon">
                 <svg viewBox="0 0 24 24">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke-linecap="round"/>
                 </svg>
             </div>
-
-            <h1>Link Bypasser</h1>
-            <p class="sub">Paste your link to get started</p>
-
-            <div class="field">
-                <input type="text" id="urlInput" placeholder="Paste link here..." autocomplete="off" spellcheck="false">
-                <button class="clear" id="clearBtn">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                    </svg>
-                </button>
-            </div>
-
-            <button class="btn" id="submitBtn">
-                <span id="btnLabel">Bypass</span>
-            </button>
-
-            <div class="dots" id="dots">
-                <span></span><span></span><span></span>
-            </div>
-
-            <div class="error" id="errorBox"></div>
-
-            <div class="result" id="resultBox">
-                <div class="link" id="resultLink"></div>
-                <div class="actions">
-                    <button class="copy-btn" id="copyBtn">Copy</button>
-                    <button class="open-btn" id="openBtn">Open</button>
+            <h1>Lua Obfuscator</h1>
+            <p class="sub">Paste your Lua code to obfuscate</p>
+            <textarea id="obfInput" placeholder="Paste your Lua code here..." spellcheck="false"></textarea>
+            <button class="btn" id="obfBtn">Obfuscate</button>
+            <div class="loading" id="obfLoad">Obfuscating...</div>
+            <div class="error" id="obfErr"></div>
+            <div class="result" id="obfOut">
+                <div class="out" id="obfResult"></div>
+                <div class="btns">
+                    <button id="obfCopy">Copy</button>
+                    <button id="obfDownload">Download .lua</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // ============ TAB SWITCH ============
+        function switchTab(t) {
+            document.querySelectorAll('.tabs button').forEach(function(b, i) {
+                b.classList.remove('active');
+                if ((t === 'bypass' && i === 0) || (t === 'obfuscator' && i === 1)) {
+                    b.classList.add('active');
+                }
+            });
+            document.getElementById('tab-bypass').classList.toggle('active', t === 'bypass');
+            document.getElementById('tab-obfuscator').classList.toggle('active', t === 'obfuscator');
+        }
+
+        // ============ BYPASS ============
         (function() {
-            // --- anti-devtools / protection ---
-            const _threshold = 160;
-            function _devtoolsCheck() {
-                if (window.outerWidth - window.innerWidth > _threshold || window.outerHeight - window.innerHeight > _threshold) {
-                    document.body.innerHTML = '';
-                    window.location.replace('about:blank');
-                }
-            }
-            setInterval(_devtoolsCheck, 800);
+            var url = document.getElementById('bpUrl');
+            var btn = document.getElementById('bpBtn');
+            var load = document.getElementById('bpLoad');
+            var err = document.getElementById('bpErr');
+            var out = document.getElementById('bpOut');
+            var result = document.getElementById('bpResult');
+            var copyBtn = document.getElementById('bpCopy');
+            var openBtn = document.getElementById('bpOpen');
 
-            setInterval(function() {
-                const s = performance.now();
-                debugger;
-                if (performance.now() - s > 80) {
-                    document.body.innerHTML = '';
-                    window.location.replace('about:blank');
-                }
-            }, 400);
-
-            document.addEventListener('keydown', function(e) {
-                const blocked = [123, 73, 74, 85, 83];
-                const key = e.keyCode;
-                if (blocked.includes(key) && (e.ctrlKey || e.shiftKey || key === 123)) {
-                    e.preventDefault();
-                    return false;
-                }
-                if (e.ctrlKey && e.shiftKey && (key === 67 || key === 73 || key === 74)) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-
-            if (window.top !== window.self) {
-                window.top.location = window.self.location;
+            function validUrl(s) {
+                return s.indexOf('http') === 0 || s.indexOf('https') === 0;
             }
 
-            console.clear();
-            setInterval(console.clear, 800);
-            const noop = function() {};
-            console.log = noop;
-            console.info = noop;
-            console.warn = noop;
-            console.error = noop;
+            btn.onclick = function() {
+                var u = url.value.trim();
+                if (!u) { err.innerHTML = 'Please enter a link'; err.className = 'error show'; return; }
+                if (!validUrl(u)) { err.innerHTML = 'Invalid link'; err.className = 'error show'; return; }
 
-            // --- config ---
-            const _api = 'aHR0cHM6Ly90cncubGF0L2FwaS9ieXBhc3M=';
-            const _key = 'VFJXX0ZSRUUtR0FZLTE1YTkyOTQ1LTliMDQtNGM3NS04MzM3LWYyYTYwMDcyODFlOQ==';
+                btn.disabled = true;
+                btn.innerHTML = 'Processing...';
+                load.className = 'loading show';
+                out.className = 'result';
+                err.className = 'error';
 
-            function _d(b64) {
-                return atob(b64);
-            }
+                var api = 'https://trw.lat/api/bypass?apikey=TRW_FREE-GAY-15a92945-9b04-4c75-8337-f2a6007281e9&url=' + encodeURIComponent(u);
 
-            // --- particles ---
-            function createParticles() {
-                const container = document.getElementById('particles');
-                for (let i = 0; i < 60; i++) {
-                    const p = document.createElement('div');
-                    p.className = 'particle';
-                    p.style.left = Math.random() * 100 + '%';
-                    p.style.width = p.style.height = (1 + Math.random() * 2.5) + 'px';
-                    p.style.animationDuration = (18 + Math.random() * 30) + 's';
-                    p.style.animationDelay = Math.random() * 25 + 's';
-                    container.appendChild(p);
-                }
-            }
-            createParticles();
-
-            // --- dom ---
-            const urlInput = document.getElementById('urlInput');
-            const clearBtn = document.getElementById('clearBtn');
-            const submitBtn = document.getElementById('submitBtn');
-            const btnLabel = document.getElementById('btnLabel');
-            const dots = document.getElementById('dots');
-            const errorBox = document.getElementById('errorBox');
-            const resultBox = document.getElementById('resultBox');
-            const resultLink = document.getElementById('resultLink');
-            const copyBtn = document.getElementById('copyBtn');
-            const openBtn = document.getElementById('openBtn');
-
-            // --- helpers ---
-            function isValidUrl(s) {
-                try { new URL(s); return true; } catch(e) { return false; }
-            }
-
-            function parseResult(r) {
-                if (typeof r !== 'string') return String(r);
-                let m = r.match(/^\\(['\"](.+?)['\"],\\s*(True|False)\\)$/);
-                if (m) return m[1];
-                m = r.match(/^[\"'](.+?)[\"']$/);
-                if (m) return m[1];
-                return r;
-            }
-
-            function showError(msg) {
-                errorBox.textContent = msg;
-                errorBox.classList.add('show');
-                resultBox.classList.remove('show');
-                setTimeout(function() { errorBox.classList.remove('show'); }, 3500);
-            }
-
-            function showResult(url) {
-                resultLink.textContent = url;
-                resultBox.classList.add('show');
-                errorBox.classList.remove('show');
-            }
-
-            // --- clear input ---
-            urlInput.addEventListener('input', function() {
-                clearBtn.classList.toggle('show', this.value.length > 0);
-            });
-
-            clearBtn.addEventListener('click', function() {
-                urlInput.value = '';
-                clearBtn.classList.remove('show');
-                resultBox.classList.remove('show');
-                errorBox.classList.remove('show');
-                urlInput.focus();
-            });
-
-            // --- copy ---
-            copyBtn.addEventListener('click', function() {
-                const text = resultLink.textContent;
-                if (!text) return;
-
-                const copyToClipboard = function(t) {
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        return navigator.clipboard.writeText(t);
-                    }
-                    return new Promise(function(resolve) {
-                        const ta = document.createElement('textarea');
-                        ta.value = t;
-                        ta.style.position = 'fixed';
-                        ta.style.opacity = '0';
-                        ta.style.pointerEvents = 'none';
-                        document.body.appendChild(ta);
-                        ta.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(ta);
-                        resolve();
+                fetch(api)
+                    .then(function(r) { return r.json(); })
+                    .then(function(d) {
+                        if (d.success && d.result) {
+                            var c = d.result;
+                            if (typeof c === 'string') {
+                                c = c.replace(/^\(['"](.+?)['"],\s*(True|False)\)$/, '$1');
+                                c = c.replace(/^["'](.+?)["']$/, '$1');
+                            }
+                            result.innerHTML = c;
+                            out.className = 'result show';
+                            copyBtn.click();
+                        } else {
+                            err.innerHTML = 'Unable to process this link';
+                            err.className = 'error show';
+                        }
+                    })
+                    .catch(function() {
+                        err.innerHTML = 'Connection error';
+                        err.className = 'error show';
+                    })
+                    .finally(function() {
+                        btn.disabled = false;
+                        btn.innerHTML = 'Bypass';
+                        load.className = 'loading';
                     });
-                };
+            };
 
-                copyToClipboard(text).then(function() {
-                    copyBtn.textContent = 'Copied!';
-                    copyBtn.classList.add('copied');
-                    setTimeout(function() {
-                        copyBtn.textContent = 'Copy';
-                        copyBtn.classList.remove('copied');
-                    }, 1800);
-                }).catch(function() {
-                    copyBtn.textContent = 'Failed';
-                    setTimeout(function() { copyBtn.textContent = 'Copy'; }, 1500);
-                });
-            });
-
-            // --- open ---
-            openBtn.addEventListener('click', function() {
-                const url = resultLink.textContent;
-                if (url && isValidUrl(url)) {
-                    window.open(url, '_blank');
+            copyBtn.onclick = function() {
+                var t = result.innerHTML;
+                if (!t) return;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(t).then(function() {
+                        copyBtn.innerHTML = 'Copied!';
+                        copyBtn.className = 'copied';
+                        setTimeout(function() { copyBtn.innerHTML = 'Copy'; copyBtn.className = ''; }, 1500);
+                    });
                 }
-            });
+            };
 
-            // --- bypass ---
-            async function doBypass(url) {
-                const apiUrl = _d(_api) + '?apikey=' + encodeURIComponent(_d(_key)) + '&url=' + encodeURIComponent(url);
-                const resp = await fetch(apiUrl, { method: 'GET', headers: { 'Accept': 'application/json' } });
-                if (!resp.ok) throw new Error('Connection error');
-                const data = await resp.json();
-                if (data.success && data.result) {
-                    return parseResult(data.result);
+            openBtn.onclick = function() {
+                var u = result.innerHTML;
+                if (u && validUrl(u)) window.open(u, '_blank');
+            };
+
+            url.onkeypress = function(e) { if (e.key === 'Enter') btn.click(); };
+        })();
+
+        // ============ LUA OBFUSCATOR ============
+        (function() {
+            var inp = document.getElementById('obfInput');
+            var btn = document.getElementById('obfBtn');
+            var load = document.getElementById('obfLoad');
+            var err = document.getElementById('obfErr');
+            var out = document.getElementById('obfOut');
+            var result = document.getElementById('obfResult');
+            var copyBtn = document.getElementById('obfCopy');
+            var downBtn = document.getElementById('obfDownload');
+
+            function obfuscate(code) {
+                // Remove comments
+                code = code.replace(/--\[\[[\s\S]*?\]\]/g, '');
+                code = code.replace(/--[^\n]*/g, '');
+
+                // Convert to \xxx format
+                var bytes = [];
+                for (var i = 0; i < code.length; i++) {
+                    bytes.push('\\' + code.charCodeAt(i));
                 }
-                throw new Error(data.message || 'Processing failed');
+                var encoded = bytes.join('');
+
+                // Split into chunks
+                var chunks = [];
+                var size = 60;
+                for (var i = 0; i < encoded.length; i += size) {
+                    chunks.push('"' + encoded.substring(i, Math.min(i + size, encoded.length)) + '"');
+                }
+
+                return 'local t={' + chunks.join(';') + '}\nlocal r=""\nfor i=1,#t do r=r..t[i] end\nlocal f=loadstring(r)\nf()';
             }
 
-            submitBtn.addEventListener('click', async function() {
-                const url = urlInput.value.trim();
+            btn.onclick = function() {
+                var v = inp.value.trim();
+                if (!v) { err.innerHTML = 'Please paste Lua code'; err.className = 'error show'; return; }
 
-                if (!url) {
-                    showError('Please enter a link');
-                    urlInput.focus();
-                    return;
-                }
+                btn.disabled = true;
+                btn.innerHTML = 'Obfuscating...';
+                load.className = 'loading show';
+                out.className = 'result';
+                err.className = 'error';
 
-                if (!isValidUrl(url)) {
-                    showError('Invalid link');
-                    return;
-                }
-
-                submitBtn.disabled = true;
-                btnLabel.textContent = 'Processing...';
-                dots.classList.add('show');
-                resultBox.classList.remove('show');
-                errorBox.classList.remove('show');
-
-                try {
-                    const result = await doBypass(url);
-                    showResult(result);
-                    copyBtn.click();
-                } catch(e) {
-                    showError('Unable to process this link');
-                } finally {
-                    submitBtn.disabled = false;
-                    btnLabel.textContent = 'Bypass';
-                    dots.classList.remove('show');
-                }
-            });
-
-            // --- enter key ---
-            urlInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') submitBtn.click();
-            });
-
-            // --- paste detection ---
-            urlInput.addEventListener('paste', function() {
                 setTimeout(function() {
-                    clearBtn.classList.toggle('show', urlInput.value.length > 0);
-                }, 50);
-            });
+                    try {
+                        var r = obfuscate(v);
+                        if (r.length < 10) {
+                            err.innerHTML = 'Could not obfuscate';
+                            err.className = 'error show';
+                        } else {
+                            result.innerHTML = r;
+                            out.className = 'result show';
+                        }
+                    } catch(e) {
+                        err.innerHTML = 'Error: ' + e.message;
+                        err.className = 'error show';
+                    }
+                    btn.disabled = false;
+                    btn.innerHTML = 'Obfuscate';
+                    load.className = 'loading';
+                }, 200);
+            };
 
+            copyBtn.onclick = function() {
+                var t = result.innerHTML;
+                if (!t) return;
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(t).then(function() {
+                        copyBtn.innerHTML = 'Copied!';
+                        copyBtn.className = 'copied';
+                        setTimeout(function() { copyBtn.innerHTML = 'Copy'; copyBtn.className = ''; }, 1500);
+                    });
+                }
+            };
+
+            downBtn.onclick = function() {
+                var t = result.innerHTML;
+                if (!t) return;
+                var b = new Blob([t], {type: 'text/plain'});
+                var u = URL.createObjectURL(b);
+                var a = document.createElement('a');
+                a.href = u; a.download = 'obfuscated.lua';
+                a.click(); URL.revokeObjectURL(u);
+                downBtn.innerHTML = 'Downloaded!';
+                downBtn.className = 'copied';
+                setTimeout(function() { downBtn.innerHTML = 'Download .lua'; downBtn.className = ''; }, 1500);
+            };
+
+            inp.onkeydown = function(e) {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    var s = this.selectionStart;
+                    this.value = this.value.substring(0, s) + '    ' + this.value.substring(this.selectionEnd);
+                    this.selectionStart = this.selectionEnd = s + 4;
+                }
+            };
         })();
     </script>
 </body>
