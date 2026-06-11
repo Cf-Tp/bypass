@@ -43,11 +43,14 @@
         
         .key-list{max-height:200px;overflow-y:auto;margin-top:10px}
         .key-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#050505;border-radius:6px;margin-bottom:4px;font-size:10px;color:#666;gap:5px}
-        .key-row .key-text{flex:1;word-break:break-all}
+        .key-row .key-text{flex:1;word-break:break-all;font-size:9px}
         .key-row .key-actions{display:flex;gap:4px;flex-shrink:0}
-        .key-row button{background:none;border:1px solid #1a0000;color:#944;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px}
-        .key-row button.copy-key{background:none;border:1px solid #1a1a3a;color:#66a;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px}
+        .key-row button{background:#0d0d0d;border:1px solid #1a1a1a;color:#888;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:9px}
+        .key-row button:hover{background:#161616;color:#fff}
+        .key-row button.copy-key{border-color:#1a1a3a;color:#66a}
         .key-row button.copy-key:hover{background:#1a1a3a;color:#aaf}
+        .key-row button.del-key{border-color:#1a0000;color:#944}
+        .key-row button.del-key:hover{background:#1a0000;color:#f44}
         
         .tabs{display:flex;gap:0;margin-bottom:20px}
         .tabs button{flex:1;padding:12px;background:#050505;border:1px solid #1a1a1a;color:#444;font-size:12px;cursor:pointer}
@@ -176,7 +179,18 @@
 <script>
 // ===== CONFIG =====
 var ADMIN = { user: 'Userfromxit00', pass: 'wertyuiop', code: '115500' };
-var keys = JSON.parse(localStorage.getItem('ux_keys') || '{}');
+
+// Carregar keys do localStorage ou usar objeto padrão
+var keys = {};
+try {
+    var savedKeys = localStorage.getItem('ux_keys');
+    if (savedKeys) {
+        keys = JSON.parse(savedKeys);
+    }
+} catch(e) {
+    keys = {};
+}
+
 var isAdmin = false;
 
 // ===== HWID =====
@@ -211,11 +225,40 @@ var HWID = genHWID();
 document.getElementById('hwidText').textContent = HWID;
 
 function copyHWID() {
-    navigator.clipboard.writeText(HWID).then(function() {
-        var btn = document.querySelector('.cpy');
-        btn.textContent = '✅ Copied!';
-        setTimeout(function() { btn.textContent = '📋 Copy HWID'; }, 1500);
-    });
+    var text = HWID;
+    copyToClipboard(text);
+    var btn = document.querySelector('.cpy');
+    btn.textContent = '✅ Copied!';
+    setTimeout(function() { btn.textContent = '📋 Copy HWID'; }, 1500);
+}
+
+// ===== FUNCAO DE COPIAR UNIVERSAL =====
+function copyToClipboard(text) {
+    // Tenta usar a API moderna
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).catch(function() {
+            fallbackCopy(text);
+        });
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '0';
+    textarea.style.opacity = '0';
+    textarea.style.pointerEvents = 'none';
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    try {
+        document.execCommand('copy');
+    } catch(e) {}
+    document.body.removeChild(textarea);
 }
 
 // ===== SCREENS =====
@@ -227,19 +270,21 @@ function showScreen(id) {
 // ===== KEYS =====
 function saveKeys() { 
     localStorage.setItem('ux_keys', JSON.stringify(keys)); 
-    console.log('Keys saved:', JSON.stringify(keys)); // Debug
 }
 
 function genKey() {
     var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var key = 'UX-';
-    for (var i = 0; i < 20; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
+    for (var i = 0; i < 20; i++) {
+        key += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
     return key;
 }
 
 // ===== USER LOGIN =====
 function userLogin() {
-    var key = document.getElementById('keyInput').value.trim();
+    var keyInput = document.getElementById('keyInput');
+    var key = keyInput.value.trim();
     var err = document.getElementById('loginError');
     err.classList.remove('show');
     
@@ -249,13 +294,16 @@ function userLogin() {
         return; 
     }
     
-    console.log('Login attempt with key:', key); // Debug
-    console.log('Available keys:', Object.keys(keys)); // Debug
+    // Recarregar keys do localStorage
+    try {
+        var saved = localStorage.getItem('ux_keys');
+        if (saved) keys = JSON.parse(saved);
+    } catch(e) {}
     
     var keyData = keys[key];
     
     if (!keyData) { 
-        err.textContent = 'Invalid key! Key not found in database.'; 
+        err.textContent = 'Invalid key! Key does not exist.'; 
         err.classList.add('show'); 
         return; 
     }
@@ -269,22 +317,20 @@ function userLogin() {
         return;
     }
     
-    // AUTO-LOCK: First user to login locks the key
+    // AUTO-LOCK
     if (!keyData.hwid) {
         keyData.hwid = HWID;
         keyData.firstUsed = Date.now();
         saveKeys();
-        console.log('Key locked to HWID:', HWID); // Debug
     }
     
-    // Check if HWID matches
+    // Check HWID
     if (keyData.hwid !== HWID) {
         err.textContent = 'This key is already locked to another PC!'; 
         err.classList.add('show'); 
         return;
     }
     
-    console.log('Login successful!'); // Debug
     localStorage.setItem('ux_key', key);
     enterMain(false, keyData);
 }
@@ -319,7 +365,7 @@ function enterMain(admin, keyData) {
         document.getElementById('adminPanel').classList.add('show'); 
         updateKeyList();
     } else {
-        document.getElementById('userLabel').textContent = '👤 ' + (keyData ? keyData.username : 'User') + ' | ' + (keyData ? keyData.duration : 'Active');
+        document.getElementById('userLabel').textContent = '👤 ' + (keyData ? (keyData.username || 'User') : 'User') + ' | ' + (keyData ? (keyData.duration || 'Active') : 'Active');
         document.getElementById('adminPanel').classList.remove('show');
     }
 }
@@ -341,6 +387,12 @@ function logoutAdmin() {
 
 // ===== CREATE KEY =====
 function createKey() {
+    // Recarregar keys
+    try {
+        var saved = localStorage.getItem('ux_keys');
+        if (saved) keys = JSON.parse(saved);
+    } catch(e) {}
+    
     var username = document.getElementById('keyUser').value.trim() || 'User';
     var duration = document.getElementById('keyDuration').value;
     var msg = document.getElementById('keyMsg'); 
@@ -372,16 +424,21 @@ function createKey() {
     };
     saveKeys();
     
-    console.log('Key created:', key); // Debug
-    
-    msg.innerHTML = '✅ Key: <code style="color:#4a4;word-break:break-all">' + key + '</code> (' + durationText + ') - Auto-lock';
+    msg.innerHTML = '✅ Created: <b style="color:#4a4">' + key + '</b> (' + durationText + ')';
     msg.classList.add('show');
     updateKeyList(); 
-    navigator.clipboard.writeText(key);
+    copyToClipboard(key);
 }
 
 function updateKeyList() {
     var list = document.getElementById('keyList');
+    
+    // Recarregar keys
+    try {
+        var saved = localStorage.getItem('ux_keys');
+        if (saved) keys = JSON.parse(saved);
+    } catch(e) {}
+    
     var active = Object.entries(keys).filter(function(e) { 
         return e[1].expiry === 'lifetime' || Date.now() < e[1].expiry; 
     });
@@ -391,27 +448,29 @@ function updateKeyList() {
         return; 
     }
     
-    list.innerHTML = active.map(function(e) {
-        var key = e[0];
-        var data = e[1];
-        var status = data.hwid ? '🔒 Locked' : '🔓 Open';
-        var keyDisplay = key.substring(0, 16) + '...';
+    var html = '';
+    for (var i = 0; i < active.length; i++) {
+        var keyFull = active[i][0];
+        var data = active[i][1];
+        var status = data.hwid ? '🔒' : '🔓';
+        var keyShort = keyFull.substring(0, 18) + '...';
         
-        return '<div class="key-row">' +
-            '<span class="key-text">' + keyDisplay + ' | ' + data.username + ' | ' + data.duration + ' | ' + status + '</span>' +
-            '<span class="key-actions">' +
-                '<button class="copy-key" onclick="copySingleKey(\'' + key + '\',this)">📋 Copy</button>' +
-                '<button onclick="deleteKey(\'' + key + '\')">X</button>' +
-            '</span>' +
-        '</div>';
-    }).join('');
+        html += '<div class="key-row">';
+        html += '<span class="key-text">' + status + ' ' + keyShort + ' | ' + data.username + ' | ' + data.duration + '</span>';
+        html += '<span class="key-actions">';
+        html += '<button class="copy-key" onclick="copySingleKey(\'' + keyFull + '\',this)">📋</button>';
+        html += '<button class="del-key" onclick="deleteKey(\'' + keyFull + '\')">✕</button>';
+        html += '</span>';
+        html += '</div>';
+    }
+    
+    list.innerHTML = html;
 }
 
 function copySingleKey(key, btn) {
-    navigator.clipboard.writeText(key).then(function() {
-        btn.textContent = '✅ Copied!';
-        setTimeout(function() { btn.textContent = '📋 Copy'; }, 1500);
-    });
+    copyToClipboard(key);
+    btn.textContent = '✅';
+    setTimeout(function() { btn.textContent = '📋'; }, 1500);
 }
 
 function deleteKey(k) { 
@@ -457,12 +516,11 @@ function doBypass() {
 function copyText(id, btn) {
     var text = document.getElementById(id).textContent;
     if (!text) return;
-    navigator.clipboard.writeText(text).then(function() {
-        var orig = btn.textContent; 
-        btn.textContent = 'Copied!'; 
-        btn.classList.add('green');
-        setTimeout(function() { btn.textContent = orig; btn.classList.remove('green'); }, 1500);
-    });
+    copyToClipboard(text);
+    var orig = btn.textContent; 
+    btn.textContent = 'Copied!'; 
+    btn.classList.add('green');
+    setTimeout(function() { btn.textContent = orig; btn.classList.remove('green'); }, 1500);
 }
 
 function openBpResult() { 
@@ -541,10 +599,6 @@ function downloadObf() {
 
 // ===== STARTUP =====
 isAdmin = localStorage.getItem('ux_admin') === 'true';
-
-console.log('Starting up...'); // Debug
-console.log('Is admin:', isAdmin); // Debug
-console.log('Keys in storage:', keys); // Debug
 
 if (isAdmin) {
     enterMain(true);
