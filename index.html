@@ -8,611 +8,251 @@
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#000;font-family:Arial,Helvetica,sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
         
-        .container{width:90%;max-width:500px}
+        .box{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px;width:90%;max-width:500px;overflow:hidden}
         
-        .screen{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px;padding:35px 30px;display:none}
-        .screen.active{display:block}
+        .tabs{display:flex;border-bottom:1px solid #1a1a1a}
+        .tabs button{flex:1;padding:14px 10px;background:#050505;border:none;color:#444;font-size:13px;cursor:pointer;border-bottom:2px solid transparent}
+        .tabs button.active{color:#ccc;background:#0a0a0a;border-bottom:2px solid #555}
         
-        h1{text-align:center;color:#ccc;font-size:20px;margin-bottom:5px}
-        .sub{text-align:center;color:#333;font-size:12px;margin-bottom:25px}
-        
-        input,textarea,select{width:100%;padding:14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;font-size:14px;color:#ccc;outline:none;margin-bottom:12px;font-family:'Courier New',monospace}
-        textarea{min-height:200px;max-height:300px;resize:vertical;line-height:1.5}
-        select{appearance:none;cursor:pointer;text-align:center;text-align-last:center}
-        input::placeholder,textarea::placeholder{color:#333}
-        input:focus,textarea:focus,select:focus{border-color:#555}
-        
-        .btn{width:100%;padding:14px;background:#111;border:1px solid #1a1a1a;border-radius:12px;color:#888;font-size:14px;cursor:pointer;margin-bottom:10px;transition:.2s;display:block;text-align:center}
-        .btn:hover{background:#161616;color:#fff}
-        .btn.green{background:#0a1a0a;border-color:#1a3a1a;color:#4a4}
-        .btn.green:hover{background:#0f1f0f;color:#6f6}
-        .btn.red{background:#1a0a0a;border-color:#1a0000;color:#944}
-        .btn.discord{background:#5865F2;border-color:#5865F2;color:#fff}
-        .btn.small{width:auto;padding:6px 14px;font-size:10px;margin:0;display:inline-block}
-        .btn.xs{padding:3px 8px;font-size:9px;width:auto;margin:0;display:inline-block}
-        
-        .msg{display:none;padding:10px;border-radius:8px;font-size:12px;margin-bottom:10px;word-break:break-all}
-        .msg.error{background:#0a0000;border:1px solid #1a0000;color:#f44}
-        .msg.success{background:#000a00;border:1px solid #001a00;color:#4a4}
-        .msg.show{display:block}
-        
-        .hwid-box{background:#050505;border:1px solid #1a1a1a;border-radius:10px;padding:12px;margin-bottom:15px}
-        .hwid-box label{color:#555;font-size:11px;display:block;margin-bottom:5px}
-        .hwid-box code{color:#888;font-size:11px;word-break:break-all;user-select:all}
-        .hwid-box .cpy{background:none;border:1px solid #1a1a1a;color:#555;font-size:10px;padding:4px 10px;border-radius:5px;cursor:pointer;margin-top:8px;display:inline-block}
-        
-        .key-list{max-height:200px;overflow-y:auto;margin-top:10px}
-        .key-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#050505;border-radius:6px;margin-bottom:4px;font-size:10px;color:#666;gap:5px}
-        .key-row .key-text{flex:1;word-break:break-all;font-size:9px}
-        .key-row .key-actions{display:flex;gap:4px;flex-shrink:0}
-        .key-row button{background:#0d0d0d;border:1px solid #1a1a1a;color:#888;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:9px}
-        .key-row button:hover{background:#161616;color:#fff}
-        .key-row button.copy-key{border-color:#1a1a3a;color:#66a}
-        .key-row button.copy-key:hover{background:#1a1a3a;color:#aaf}
-        .key-row button.del-key{border-color:#1a0000;color:#944}
-        .key-row button.del-key:hover{background:#1a0000;color:#f44}
-        
-        .tabs{display:flex;gap:0;margin-bottom:20px}
-        .tabs button{flex:1;padding:12px;background:#050505;border:1px solid #1a1a1a;color:#444;font-size:12px;cursor:pointer}
-        .tabs button:first-child{border-radius:10px 0 0 10px}
-        .tabs button:last-child{border-radius:0 10px 10px 0}
-        .tabs button.active{background:#0a0a0a;color:#ccc}
-        
-        .tab-content{display:none}
+        .tab-content{padding:30px;display:none}
         .tab-content.active{display:block}
+        .tab-content h1{text-align:center;color:#ccc;font-size:20px;margin-bottom:5px}
+        .tab-content .sub{text-align:center;color:#333;font-size:12px;margin-bottom:25px}
         
-        .output-box{background:#050505;border:1px solid #1a1a1a;border-radius:10px;padding:12px;margin-top:10px;max-height:250px;overflow-y:auto;display:none}
-        .output-box.show{display:block}
-        .output-box pre{color:#888;font-size:12px;white-space:pre-wrap;word-break:break-all;font-family:'Courier New',monospace;line-height:1.5;margin:0}
+        input[type="text"],textarea{width:100%;padding:14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;font-size:14px;color:#ccc;outline:none;margin-bottom:12px;font-family:'Courier New',monospace}
+        textarea{min-height:200px;max-height:300px;resize:vertical;line-height:1.5}
+        input::placeholder,textarea::placeholder{color:#333}
+        input:focus,textarea:focus{border-color:#555}
         
-        .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-        .top-bar span{color:#555;font-size:11px}
+        .btn{width:100%;padding:14px;background:#111;border:1px solid #1a1a1a;border-radius:12px;color:#888;font-size:14px;cursor:pointer;margin-bottom:10px;transition:.2s;text-align:center;display:block}
+        .btn:hover{background:#161616;color:#fff}
+        .btn.small{flex:1;padding:10px;font-size:11px;margin-bottom:0}
         
-        .admin-section{margin-top:25px;padding:20px;background:#050505;border:1px solid #1a1a1a;border-radius:12px;display:none}
-        .admin-section.show{display:block}
-        .admin-section h3{color:#ccc;font-size:14px;text-align:center;margin-bottom:15px}
+        .result-box{background:#050505;border:1px solid #1a1a1a;border-radius:10px;padding:12px;margin-top:10px;max-height:250px;overflow-y:auto;display:none}
+        .result-box.show{display:block}
+        .result-box pre{color:#888;font-size:12px;white-space:pre-wrap;word-break:break-all;font-family:'Courier New',monospace;line-height:1.5;margin:0 0 10px 0}
+        .result-box .btns{display:flex;gap:8px}
+        .copied{background:#0a1a0a!important;border-color:#1a3a1a!important;color:#4a4!important}
     </style>
 </head>
 <body>
-
-<div class="container">
-
-    <!-- LOGIN SCREEN -->
-    <div class="screen active" id="loginScreen">
-        <h1>🔐 Userfromxit</h1>
-        <p class="sub">Auto-Lock Key System</p>
-        
-        <div class="hwid-box">
-            <label>🔒 Your HWID:</label>
-            <code id="hwidText">Generating...</code>
-            <button class="cpy" onclick="copyHWID()">📋 Copy HWID</button>
-        </div>
-        
-        <input type="text" id="keyInput" placeholder="Enter your key..." autocomplete="off" spellcheck="false">
-        <button class="btn" onclick="userLogin()">Login</button>
-        <div class="msg error" id="loginError"></div>
-        
-        <p style="color:#333;font-size:10px;text-align:center;margin:10px 0">First login locks the key to your PC</p>
-        <button class="btn discord" onclick="window.open('https://discord.gg/SEU-SERVIDOR','_blank')">💬 Join Discord</button>
-        <button class="btn" style="color:#333;font-size:11px;margin-top:10px" onclick="showScreen('adminLoginScreen')">Admin Panel</button>
-    </div>
-    
-    <!-- ADMIN LOGIN -->
-    <div class="screen" id="adminLoginScreen">
-        <h1>⚙️ Admin Login</h1>
-        <p class="sub">Enter your credentials</p>
-        
-        <input type="text" id="adminUser" placeholder="Username" autocomplete="off">
-        <input type="password" id="adminPass" placeholder="Password">
-        <input type="text" id="adminCode" placeholder="Security Code" autocomplete="off">
-        <button class="btn" onclick="adminLogin()">Login</button>
-        <div class="msg error" id="adminError"></div>
-        <button class="btn" style="color:#333;font-size:11px" onclick="showScreen('loginScreen')">Back</button>
-    </div>
-
-    <!-- MAIN SCREEN -->
-    <div class="screen" id="mainScreen">
-        <div class="top-bar">
-            <span id="userLabel">Welcome</span>
-            <button class="btn red small" onclick="doLogout()">Logout</button>
-        </div>
-        
+    <div class="box" id="mainBox">
         <div class="tabs">
-            <button class="active" onclick="switchTab('bypass',this)">Bypass</button>
-            <button onclick="switchTab('obf',this)">Lua Obfuscator</button>
+            <button class="active" id="tabBtn1">Bypass</button>
+            <button id="tabBtn2">Lua Obfuscator</button>
         </div>
         
-        <!-- BYPASS -->
-        <div class="tab-content active" id="tabBypass">
+        <!-- BYPASS TAB -->
+        <div class="tab-content active" id="tab1">
+            <h1>Link Bypasser</h1>
+            <p class="sub">Paste your link to get started</p>
             <input type="text" id="bpUrl" placeholder="Paste link here..." autocomplete="off">
-            <button class="btn" onclick="doBypass()">Bypass</button>
-            <div class="output-box" id="bpOutput">
-                <pre id="bpResult"></pre>
-                <div style="display:flex;gap:8px;margin-top:10px">
-                    <button class="btn small" style="flex:1;font-size:11px;margin:0" onclick="copyText('bpResult',this)">Copy</button>
-                    <button class="btn small" style="flex:1;font-size:11px;margin:0" onclick="openBpResult()">Open</button>
+            <button class="btn" id="bpBtn">Bypass</button>
+            <div class="result-box" id="bpResultBox">
+                <pre id="bpResultText"></pre>
+                <div class="btns">
+                    <button class="btn small" id="bpCopyBtn">Copy</button>
+                    <button class="btn small" id="bpOpenBtn">Open</button>
                 </div>
             </div>
         </div>
         
-        <!-- LUA OBFUSCATOR -->
-        <div class="tab-content" id="tabObf">
+        <!-- OBFUSCATOR TAB -->
+        <div class="tab-content" id="tab2">
+            <h1>Lua Obfuscator</h1>
+            <p class="sub">Paste your Lua code to obfuscate</p>
             <textarea id="obfInput" placeholder="Paste your Lua code here..." spellcheck="false"></textarea>
-            <button class="btn" onclick="doObfuscate()">Obfuscate</button>
-            <div class="output-box" id="obfOutput">
-                <pre id="obfResult"></pre>
-                <div style="display:flex;gap:8px;margin-top:10px">
-                    <button class="btn small" style="flex:1;font-size:11px;margin:0" onclick="copyText('obfResult',this)">Copy</button>
-                    <button class="btn small" style="flex:1;font-size:11px;margin:0" onclick="downloadObf()">Download</button>
+            <button class="btn" id="obfBtn">Obfuscate</button>
+            <div class="result-box" id="obfResultBox">
+                <pre id="obfResultText"></pre>
+                <div class="btns">
+                    <button class="btn small" id="obfCopyBtn">Copy</button>
+                    <button class="btn small" id="obfDownloadBtn">Download</button>
                 </div>
-            </div>
-            
-            <!-- ADMIN PANEL -->
-            <div class="admin-section" id="adminPanel">
-                <h3>🔑 Create Key</h3>
-                <p style="color:#555;font-size:10px;text-align:center;margin-bottom:12px">Key locks to first user who activates it</p>
-                <input type="text" id="keyUser" placeholder="Username (optional)">
-                <select id="keyDuration">
-                    <option value="1h">1 Hour</option>
-                    <option value="3h">3 Hours</option>
-                    <option value="6h">6 Hours</option>
-                    <option value="12h">12 Hours</option>
-                    <option value="1d">1 Day</option>
-                    <option value="3d">3 Days</option>
-                    <option value="7d">7 Days</option>
-                    <option value="14d">14 Days</option>
-                    <option value="30d">30 Days</option>
-                    <option value="lifetime">Lifetime</option>
-                </select>
-                <button class="btn green" onclick="createKey()">Create Key</button>
-                <div class="msg success" id="keyMsg"></div>
-                
-                <h3 style="color:#ccc;font-size:13px;text-align:center;margin-top:20px;margin-bottom:10px">📋 Active Keys</h3>
-                <div class="key-list" id="keyList"></div>
-                <button class="btn red" onclick="logoutAdmin()" style="margin-top:15px">Exit Admin</button>
             </div>
         </div>
     </div>
 
-</div>
-
-<script>
-// ===== CONFIG =====
-var ADMIN = { user: 'Userfromxit00', pass: 'wertyuiop', code: '115500' };
-
-// Carregar keys do localStorage ou usar objeto padrão
-var keys = {};
-try {
-    var savedKeys = localStorage.getItem('ux_keys');
-    if (savedKeys) {
-        keys = JSON.parse(savedKeys);
-    }
-} catch(e) {
-    keys = {};
-}
-
-var isAdmin = false;
-
-// ===== HWID =====
-function genHWID() {
-    var data = [
-        navigator.userAgent,
-        navigator.language,
-        screen.width + 'x' + screen.height,
-        screen.colorDepth,
-        new Date().getTimezoneOffset(),
-        navigator.hardwareConcurrency || 4,
-        navigator.deviceMemory || 4
-    ].join('||');
-    
-    var hash = 0;
-    for (var i = 0; i < data.length; i++) {
-        hash = ((hash << 5) - hash) + data.charCodeAt(i);
-        hash = hash & hash;
-    }
-    
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    var result = 'HWID-';
-    var seed = Math.abs(hash);
-    for (var i = 0; i < 16; i++) {
-        seed = (seed * 16807 + 0) % 2147483647;
-        result += chars.charAt(seed % chars.length);
-    }
-    return result;
-}
-
-var HWID = genHWID();
-document.getElementById('hwidText').textContent = HWID;
-
-function copyHWID() {
-    var text = HWID;
-    copyToClipboard(text);
-    var btn = document.querySelector('.cpy');
-    btn.textContent = '✅ Copied!';
-    setTimeout(function() { btn.textContent = '📋 Copy HWID'; }, 1500);
-}
-
-// ===== FUNCAO DE COPIAR UNIVERSAL =====
-function copyToClipboard(text) {
-    // Tenta usar a API moderna
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).catch(function() {
-            fallbackCopy(text);
+    <script>
+    (function() {
+        // ===== PROTEÇÃO =====
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+            }
         });
-    } else {
-        fallbackCopy(text);
-    }
-}
+        setInterval(function() {
+            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
+                document.body.innerHTML = '';
+                window.location.replace('about:blank');
+            }
+        }, 1000);
 
-function fallbackCopy(text) {
-    var textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.top = '0';
-    textarea.style.left = '0';
-    textarea.style.opacity = '0';
-    textarea.style.pointerEvents = 'none';
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    try {
-        document.execCommand('copy');
-    } catch(e) {}
-    document.body.removeChild(textarea);
-}
+        // ===== TABS =====
+        document.getElementById('tabBtn1').onclick = function() {
+            this.classList.add('active');
+            document.getElementById('tabBtn2').classList.remove('active');
+            document.getElementById('tab1').classList.add('active');
+            document.getElementById('tab2').classList.remove('active');
+        };
+        document.getElementById('tabBtn2').onclick = function() {
+            this.classList.add('active');
+            document.getElementById('tabBtn1').classList.remove('active');
+            document.getElementById('tab2').classList.add('active');
+            document.getElementById('tab1').classList.remove('active');
+        };
 
-// ===== SCREENS =====
-function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
-    document.getElementById(id).classList.add('active');
-}
+        // ===== BYPASS =====
+        document.getElementById('bpBtn').onclick = function() {
+            var url = document.getElementById('bpUrl').value.trim();
+            if (!url) return;
+            
+            var btn = this;
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            document.getElementById('bpResultBox').classList.remove('show');
+            
+            fetch('https://trw.lat/api/bypass?apikey=TRW_FREE-GAY-15a92945-9b04-4c75-8337-f2a6007281e9&url=' + encodeURIComponent(url))
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    if (d.success && d.result) {
+                        var clean = d.result;
+                        if (typeof clean === 'string') {
+                            clean = clean.replace(/^\(['"](.+?)['"],\s*(True|False)\)$/, '$1');
+                            clean = clean.replace(/^["'](.+?)["']$/, '$1');
+                        }
+                        document.getElementById('bpResultText').textContent = clean;
+                        document.getElementById('bpResultBox').classList.add('show');
+                    }
+                })
+                .catch(function() {
+                    document.getElementById('bpResultText').textContent = 'Error connecting';
+                    document.getElementById('bpResultBox').classList.add('show');
+                })
+                .finally(function() {
+                    btn.disabled = false;
+                    btn.textContent = 'Bypass';
+                });
+        };
 
-// ===== KEYS =====
-function saveKeys() { 
-    localStorage.setItem('ux_keys', JSON.stringify(keys)); 
-}
+        document.getElementById('bpCopyBtn').onclick = function() {
+            copyText(document.getElementById('bpResultText').textContent, this);
+        };
 
-function genKey() {
-    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var key = 'UX-';
-    for (var i = 0; i < 20; i++) {
-        key += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return key;
-}
+        document.getElementById('bpOpenBtn').onclick = function() {
+            var url = document.getElementById('bpResultText').textContent;
+            if (url && url.indexOf('http') === 0) window.open(url, '_blank');
+        };
 
-// ===== USER LOGIN =====
-function userLogin() {
-    var keyInput = document.getElementById('keyInput');
-    var key = keyInput.value.trim();
-    var err = document.getElementById('loginError');
-    err.classList.remove('show');
-    
-    if (!key) { 
-        err.textContent = 'Please enter a key!'; 
-        err.classList.add('show'); 
-        return; 
-    }
-    
-    // Recarregar keys do localStorage
-    try {
-        var saved = localStorage.getItem('ux_keys');
-        if (saved) keys = JSON.parse(saved);
-    } catch(e) {}
-    
-    var keyData = keys[key];
-    
-    if (!keyData) { 
-        err.textContent = 'Invalid key! Key does not exist.'; 
-        err.classList.add('show'); 
-        return; 
-    }
-    
-    // Check expiry
-    if (keyData.expiry !== 'lifetime' && Date.now() > keyData.expiry) {
-        delete keys[key]; 
-        saveKeys();
-        err.textContent = 'Key expired!'; 
-        err.classList.add('show'); 
-        return;
-    }
-    
-    // AUTO-LOCK
-    if (!keyData.hwid) {
-        keyData.hwid = HWID;
-        keyData.firstUsed = Date.now();
-        saveKeys();
-    }
-    
-    // Check HWID
-    if (keyData.hwid !== HWID) {
-        err.textContent = 'This key is already locked to another PC!'; 
-        err.classList.add('show'); 
-        return;
-    }
-    
-    localStorage.setItem('ux_key', key);
-    enterMain(false, keyData);
-}
+        document.getElementById('bpUrl').onkeypress = function(e) {
+            if (e.key === 'Enter') document.getElementById('bpBtn').click();
+        };
 
-document.getElementById('keyInput').addEventListener('keypress', function(e) { 
-    if (e.key === 'Enter') userLogin(); 
-});
-
-// ===== ADMIN LOGIN =====
-function adminLogin() {
-    var u = document.getElementById('adminUser').value.trim();
-    var p = document.getElementById('adminPass').value.trim();
-    var c = document.getElementById('adminCode').value.trim();
-    var err = document.getElementById('adminError');
-    err.classList.remove('show');
-    
-    if (u === ADMIN.user && p === ADMIN.pass && c === ADMIN.code) {
-        localStorage.setItem('ux_admin', 'true'); 
-        isAdmin = true; 
-        enterMain(true);
-    } else {
-        err.textContent = 'Invalid credentials!'; 
-        err.classList.add('show');
-    }
-}
-
-// ===== ENTER MAIN =====
-function enterMain(admin, keyData) {
-    showScreen('mainScreen');
-    if (admin) {
-        document.getElementById('userLabel').textContent = '👑 Admin | Unlimited';
-        document.getElementById('adminPanel').classList.add('show'); 
-        updateKeyList();
-    } else {
-        document.getElementById('userLabel').textContent = '👤 ' + (keyData ? (keyData.username || 'User') : 'User') + ' | ' + (keyData ? (keyData.duration || 'Active') : 'Active');
-        document.getElementById('adminPanel').classList.remove('show');
-    }
-}
-
-function doLogout() {
-    localStorage.removeItem('ux_key'); 
-    document.getElementById('adminPanel').classList.remove('show');
-    showScreen('loginScreen'); 
-    document.getElementById('keyInput').value = '';
-    document.getElementById('loginError').classList.remove('show');
-}
-
-function logoutAdmin() {
-    localStorage.removeItem('ux_admin'); 
-    isAdmin = false;
-    document.getElementById('adminPanel').classList.remove('show'); 
-    showScreen('loginScreen');
-}
-
-// ===== CREATE KEY =====
-function createKey() {
-    // Recarregar keys
-    try {
-        var saved = localStorage.getItem('ux_keys');
-        if (saved) keys = JSON.parse(saved);
-    } catch(e) {}
-    
-    var username = document.getElementById('keyUser').value.trim() || 'User';
-    var duration = document.getElementById('keyDuration').value;
-    var msg = document.getElementById('keyMsg'); 
-    msg.classList.remove('show');
-    
-    var key = genKey(); 
-    var expiry = null; 
-    var durationText = '';
-    
-    switch(duration) {
-        case '1h': expiry = Date.now() + 3600000; durationText = '1 Hour'; break;
-        case '3h': expiry = Date.now() + 10800000; durationText = '3 Hours'; break;
-        case '6h': expiry = Date.now() + 21600000; durationText = '6 Hours'; break;
-        case '12h': expiry = Date.now() + 43200000; durationText = '12 Hours'; break;
-        case '1d': expiry = Date.now() + 86400000; durationText = '1 Day'; break;
-        case '3d': expiry = Date.now() + 259200000; durationText = '3 Days'; break;
-        case '7d': expiry = Date.now() + 604800000; durationText = '7 Days'; break;
-        case '14d': expiry = Date.now() + 1209600000; durationText = '14 Days'; break;
-        case '30d': expiry = Date.now() + 2592000000; durationText = '30 Days'; break;
-        case 'lifetime': expiry = 'lifetime'; durationText = 'Lifetime'; break;
-    }
-    
-    keys[key] = { 
-        username: username, 
-        hwid: null, 
-        duration: durationText, 
-        expiry: expiry, 
-        createdAt: Date.now() 
-    };
-    saveKeys();
-    
-    msg.innerHTML = '✅ Created: <b style="color:#4a4">' + key + '</b> (' + durationText + ')';
-    msg.classList.add('show');
-    updateKeyList(); 
-    copyToClipboard(key);
-}
-
-function updateKeyList() {
-    var list = document.getElementById('keyList');
-    
-    // Recarregar keys
-    try {
-        var saved = localStorage.getItem('ux_keys');
-        if (saved) keys = JSON.parse(saved);
-    } catch(e) {}
-    
-    var active = Object.entries(keys).filter(function(e) { 
-        return e[1].expiry === 'lifetime' || Date.now() < e[1].expiry; 
-    });
-    
-    if (active.length === 0) { 
-        list.innerHTML = '<p style="color:#444;font-size:11px;text-align:center">No active keys</p>'; 
-        return; 
-    }
-    
-    var html = '';
-    for (var i = 0; i < active.length; i++) {
-        var keyFull = active[i][0];
-        var data = active[i][1];
-        var status = data.hwid ? '🔒' : '🔓';
-        var keyShort = keyFull.substring(0, 18) + '...';
-        
-        html += '<div class="key-row">';
-        html += '<span class="key-text">' + status + ' ' + keyShort + ' | ' + data.username + ' | ' + data.duration + '</span>';
-        html += '<span class="key-actions">';
-        html += '<button class="copy-key" onclick="copySingleKey(\'' + keyFull + '\',this)">📋</button>';
-        html += '<button class="del-key" onclick="deleteKey(\'' + keyFull + '\')">✕</button>';
-        html += '</span>';
-        html += '</div>';
-    }
-    
-    list.innerHTML = html;
-}
-
-function copySingleKey(key, btn) {
-    copyToClipboard(key);
-    btn.textContent = '✅';
-    setTimeout(function() { btn.textContent = '📋'; }, 1500);
-}
-
-function deleteKey(k) { 
-    if (!isAdmin) return; 
-    delete keys[k]; 
-    saveKeys(); 
-    updateKeyList(); 
-}
-
-// ===== TABS =====
-function switchTab(tab, btn) {
-    document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
-    btn.classList.add('active');
-    document.getElementById('tabBypass').classList.toggle('active', tab === 'bypass');
-    document.getElementById('tabObf').classList.toggle('active', tab === 'obf');
-}
-
-// ===== BYPASS =====
-function doBypass() {
-    var url = document.getElementById('bpUrl').value.trim();
-    if (!url) return;
-    document.getElementById('bpOutput').classList.remove('show');
-    
-    fetch('https://trw.lat/api/bypass?apikey=TRW_FREE-GAY-15a92945-9b04-4c75-8337-f2a6007281e9&url=' + encodeURIComponent(url))
-        .then(function(r) { return r.json(); })
-        .then(function(d) {
-            if (d.success && d.result) {
-                var clean = d.result;
-                if (typeof clean === 'string') { 
-                    clean = clean.replace(/^\(['"](.+?)['"],\s*(True|False)\)$/, '$1'); 
-                    clean = clean.replace(/^["'](.+?)["']$/, '$1'); 
+        // ===== OBFUSCATOR =====
+        document.getElementById('obfBtn').onclick = function() {
+            var code = document.getElementById('obfInput').value.trim();
+            if (!code) return;
+            
+            // Remove comments
+            code = code.replace(/--\[\[[\s\S]*?\]\]/g, '');
+            code = code.replace(/--[^\n]*/g, '');
+            
+            // Rename local vars
+            var reserved = ['nil','true','false','and','or','not','local','function','if','then','else','elseif','end','for','while','do','repeat','until','return','break','in','goto'];
+            var localRegex = /\blocal\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
+            var match;
+            var varMap = {};
+            
+            while ((match = localRegex.exec(code)) !== null) {
+                if (reserved.indexOf(match[1]) === -1 && match[1].length > 1 && !varMap[match[1]]) {
+                    varMap[match[1]] = randomStr(10);
                 }
-                document.getElementById('bpResult').textContent = clean;
-                document.getElementById('bpOutput').classList.add('show');
             }
-        })
-        .catch(function() { 
-            document.getElementById('bpResult').textContent = 'Error connecting'; 
-            document.getElementById('bpOutput').classList.add('show'); 
-        });
-}
-
-function copyText(id, btn) {
-    var text = document.getElementById(id).textContent;
-    if (!text) return;
-    copyToClipboard(text);
-    var orig = btn.textContent; 
-    btn.textContent = 'Copied!'; 
-    btn.classList.add('green');
-    setTimeout(function() { btn.textContent = orig; btn.classList.remove('green'); }, 1500);
-}
-
-function openBpResult() { 
-    var url = document.getElementById('bpResult').textContent; 
-    if (url && url.startsWith('http')) window.open(url, '_blank'); 
-}
-
-// ===== OBFUSCATOR =====
-function randomStr(len) {
-    var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    var str = '';
-    for (var i = 0; i < len; i++) str += chars.charAt(Math.floor(Math.random() * chars.length));
-    return str;
-}
-
-function doObfuscate() {
-    var code = document.getElementById('obfInput').value.trim();
-    if (!code) return;
-    
-    try {
-        code = code.replace(/--\[\[[\s\S]*?\]\]/g, '');
-        code = code.replace(/--[^\n]*/g, '');
-        
-        var reserved = ['nil','true','false','and','or','not','local','function','if','then','else','elseif','end','for','while','do','repeat','until','return','break','in','goto'];
-        var localRegex = /\blocal\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
-        var match;
-        var varMap = {};
-        while ((match = localRegex.exec(code)) !== null) {
-            if (reserved.indexOf(match[1]) === -1 && match[1].length > 1 && !varMap[match[1]]) {
-                varMap[match[1]] = randomStr(10);
+            
+            for (var old in varMap) {
+                var safe = old.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                code = code.replace(new RegExp('\\b' + safe + '\\b', 'g'), varMap[old]);
             }
-        }
-        for (var old in varMap) {
-            var safe = old.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            code = code.replace(new RegExp('\\b' + safe + '\\b', 'g'), varMap[old]);
-        }
-        
-        var bytes = [];
-        for (var i = 0; i < code.length; i++) bytes.push('\\' + code.charCodeAt(i));
-        var encoded = bytes.join('');
-        
-        var chunks = [];
-        for (var i = 0; i < encoded.length; i += 50) {
-            chunks.push('"' + encoded.substring(i, Math.min(i + 50, encoded.length)) + '"');
-        }
-        
-        var v1 = 't' + randomStr(6);
-        var v2 = 'r' + randomStr(6);
-        var v3 = 'i' + randomStr(6);
-        var v4 = 'f' + randomStr(5);
-        
-        var result = 'local ' + v1 + '={' + chunks.join(';') + '}\n';
-        result += 'local ' + v2 + '=""\n';
-        result += 'for ' + v3 + '=1,#' + v1 + ' do ' + v2 + '=' + v2 + '..' + v1 + '[' + v3 + '] end\n';
-        result += 'local ' + v4 + '=loadstring(' + v2 + ')\n';
-        result += v4 + '()';
-        
-        document.getElementById('obfResult').textContent = result;
-        document.getElementById('obfOutput').classList.add('show');
-    } catch(e) {
-        document.getElementById('obfResult').textContent = 'Error: ' + e.message;
-        document.getElementById('obfOutput').classList.add('show');
-    }
-}
+            
+            // Convert to bytes
+            var bytes = [];
+            for (var i = 0; i < code.length; i++) {
+                bytes.push('\\' + code.charCodeAt(i));
+            }
+            var encoded = bytes.join('');
+            
+            // Split into chunks
+            var chunks = [];
+            for (var i = 0; i < encoded.length; i += 50) {
+                chunks.push('"' + encoded.substring(i, Math.min(i + 50, encoded.length)) + '"');
+            }
+            
+            // Generate var names
+            var v1 = 't' + randomStr(6);
+            var v2 = 'r' + randomStr(6);
+            var v3 = 'i' + randomStr(6);
+            var v4 = 'f' + randomStr(5);
+            
+            // Build result
+            var result = 'local ' + v1 + '={' + chunks.join(';') + '}\n';
+            result += 'local ' + v2 + '=""\n';
+            result += 'for ' + v3 + '=1,#' + v1 + ' do ' + v2 + '=' + v2 + '..' + v1 + '[' + v3 + '] end\n';
+            result += 'local ' + v4 + '=loadstring(' + v2 + ')\n';
+            result += v4 + '()';
+            
+            document.getElementById('obfResultText').textContent = result;
+            document.getElementById('obfResultBox').classList.add('show');
+        };
 
-function downloadObf() {
-    var text = document.getElementById('obfResult').textContent;
-    if (!text) return;
-    var blob = new Blob([text], { type: 'text/plain' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url; a.download = 'obfuscated.lua';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
+        document.getElementById('obfCopyBtn').onclick = function() {
+            copyText(document.getElementById('obfResultText').textContent, this);
+        };
 
-// ===== STARTUP =====
-isAdmin = localStorage.getItem('ux_admin') === 'true';
+        document.getElementById('obfDownloadBtn').onclick = function() {
+            var text = document.getElementById('obfResultText').textContent;
+            if (!text) return;
+            var blob = new Blob([text], { type: 'text/plain' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'obfuscated.lua';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
 
-if (isAdmin) {
-    enterMain(true);
-} else {
-    var savedKey = localStorage.getItem('ux_key');
-    if (savedKey && keys[savedKey]) {
-        var kd = keys[savedKey];
-        if ((kd.expiry === 'lifetime' || Date.now() < kd.expiry) && kd.hwid === HWID) {
-            enterMain(false, kd);
-        } else {
-            localStorage.removeItem('ux_key');
+        // ===== UTILS =====
+        function randomStr(len) {
+            var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            var str = '';
+            for (var i = 0; i < len; i++) str += chars.charAt(Math.floor(Math.random() * chars.length));
+            return str;
         }
-    }
-}
-</script>
+
+        function copyText(text, btn) {
+            if (!text) return;
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            ta.style.top = '0';
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            
+            var orig = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(function() {
+                btn.textContent = orig;
+                btn.classList.remove('copied');
+            }, 1500);
+        }
+    })();
+    </script>
 </body>
 </html>
