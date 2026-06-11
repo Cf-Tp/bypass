@@ -29,6 +29,7 @@
         .btn.red{background:#1a0a0a;border-color:#1a0000;color:#944}
         .btn.discord{background:#5865F2;border-color:#5865F2;color:#fff}
         .btn.small{width:auto;padding:6px 14px;font-size:10px;margin:0;display:inline-block}
+        .btn.xs{padding:3px 8px;font-size:9px;width:auto;margin:0;display:inline-block}
         
         .msg{display:none;padding:10px;border-radius:8px;font-size:12px;margin-bottom:10px;word-break:break-all}
         .msg.error{background:#0a0000;border:1px solid #1a0000;color:#f44}
@@ -41,9 +42,12 @@
         .hwid-box .cpy{background:none;border:1px solid #1a1a1a;color:#555;font-size:10px;padding:4px 10px;border-radius:5px;cursor:pointer;margin-top:8px;display:inline-block}
         
         .key-list{max-height:200px;overflow-y:auto;margin-top:10px}
-        .key-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#050505;border-radius:6px;margin-bottom:4px;font-size:10px;color:#666}
-        .key-row span{flex:1}
-        .key-row button{background:none;border:1px solid #1a0000;color:#944;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px;margin-left:8px}
+        .key-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#050505;border-radius:6px;margin-bottom:4px;font-size:10px;color:#666;gap:5px}
+        .key-row .key-text{flex:1;word-break:break-all}
+        .key-row .key-actions{display:flex;gap:4px;flex-shrink:0}
+        .key-row button{background:none;border:1px solid #1a0000;color:#944;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px}
+        .key-row button.copy-key{background:none;border:1px solid #1a1a3a;color:#66a;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px}
+        .key-row button.copy-key:hover{background:#1a1a3a;color:#aaf}
         
         .tabs{display:flex;gap:0;margin-bottom:20px}
         .tabs button{flex:1;padding:12px;background:#050505;border:1px solid #1a1a1a;color:#444;font-size:12px;cursor:pointer}
@@ -81,7 +85,7 @@
             <button class="cpy" onclick="copyHWID()">📋 Copy HWID</button>
         </div>
         
-        <input type="text" id="keyInput" placeholder="Enter your key..." autocomplete="off">
+        <input type="text" id="keyInput" placeholder="Enter your key..." autocomplete="off" spellcheck="false">
         <button class="btn" onclick="userLogin()">Login</button>
         <div class="msg error" id="loginError"></div>
         
@@ -221,7 +225,10 @@ function showScreen(id) {
 }
 
 // ===== KEYS =====
-function saveKeys() { localStorage.setItem('ux_keys', JSON.stringify(keys)); }
+function saveKeys() { 
+    localStorage.setItem('ux_keys', JSON.stringify(keys)); 
+    console.log('Keys saved:', JSON.stringify(keys)); // Debug
+}
 
 function genKey() {
     var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -236,33 +243,55 @@ function userLogin() {
     var err = document.getElementById('loginError');
     err.classList.remove('show');
     
-    if (!key) { err.textContent = 'Please enter a key!'; err.classList.add('show'); return; }
-    
-    var keyData = keys[key];
-    if (!keyData) { err.textContent = 'Invalid key!'; err.classList.add('show'); return; }
-    
-    if (keyData.expiry !== 'lifetime' && Date.now() > keyData.expiry) {
-        delete keys[key]; saveKeys();
-        err.textContent = 'Key expired!'; err.classList.add('show'); return;
+    if (!key) { 
+        err.textContent = 'Please enter a key!'; 
+        err.classList.add('show'); 
+        return; 
     }
     
+    console.log('Login attempt with key:', key); // Debug
+    console.log('Available keys:', Object.keys(keys)); // Debug
+    
+    var keyData = keys[key];
+    
+    if (!keyData) { 
+        err.textContent = 'Invalid key! Key not found in database.'; 
+        err.classList.add('show'); 
+        return; 
+    }
+    
+    // Check expiry
+    if (keyData.expiry !== 'lifetime' && Date.now() > keyData.expiry) {
+        delete keys[key]; 
+        saveKeys();
+        err.textContent = 'Key expired!'; 
+        err.classList.add('show'); 
+        return;
+    }
+    
+    // AUTO-LOCK: First user to login locks the key
     if (!keyData.hwid) {
         keyData.hwid = HWID;
         keyData.firstUsed = Date.now();
         saveKeys();
+        console.log('Key locked to HWID:', HWID); // Debug
     }
     
+    // Check if HWID matches
     if (keyData.hwid !== HWID) {
-        err.textContent = 'This key is already locked to another PC!';
-        err.classList.add('show');
+        err.textContent = 'This key is already locked to another PC!'; 
+        err.classList.add('show'); 
         return;
     }
     
+    console.log('Login successful!'); // Debug
     localStorage.setItem('ux_key', key);
     enterMain(false, keyData);
 }
 
-document.getElementById('keyInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') userLogin(); });
+document.getElementById('keyInput').addEventListener('keypress', function(e) { 
+    if (e.key === 'Enter') userLogin(); 
+});
 
 // ===== ADMIN LOGIN =====
 function adminLogin() {
@@ -273,9 +302,12 @@ function adminLogin() {
     err.classList.remove('show');
     
     if (u === ADMIN.user && p === ADMIN.pass && c === ADMIN.code) {
-        localStorage.setItem('ux_admin', 'true'); isAdmin = true; enterMain(true);
+        localStorage.setItem('ux_admin', 'true'); 
+        isAdmin = true; 
+        enterMain(true);
     } else {
-        err.textContent = 'Invalid credentials!'; err.classList.add('show');
+        err.textContent = 'Invalid credentials!'; 
+        err.classList.add('show');
     }
 }
 
@@ -284,7 +316,8 @@ function enterMain(admin, keyData) {
     showScreen('mainScreen');
     if (admin) {
         document.getElementById('userLabel').textContent = '👑 Admin | Unlimited';
-        document.getElementById('adminPanel').classList.add('show'); updateKeyList();
+        document.getElementById('adminPanel').classList.add('show'); 
+        updateKeyList();
     } else {
         document.getElementById('userLabel').textContent = '👤 ' + (keyData ? keyData.username : 'User') + ' | ' + (keyData ? keyData.duration : 'Active');
         document.getElementById('adminPanel').classList.remove('show');
@@ -292,22 +325,31 @@ function enterMain(admin, keyData) {
 }
 
 function doLogout() {
-    localStorage.removeItem('ux_key'); document.getElementById('adminPanel').classList.remove('show');
-    showScreen('loginScreen'); document.getElementById('keyInput').value = '';
+    localStorage.removeItem('ux_key'); 
+    document.getElementById('adminPanel').classList.remove('show');
+    showScreen('loginScreen'); 
+    document.getElementById('keyInput').value = '';
+    document.getElementById('loginError').classList.remove('show');
 }
 
 function logoutAdmin() {
-    localStorage.removeItem('ux_admin'); isAdmin = false;
-    document.getElementById('adminPanel').classList.remove('show'); showScreen('loginScreen');
+    localStorage.removeItem('ux_admin'); 
+    isAdmin = false;
+    document.getElementById('adminPanel').classList.remove('show'); 
+    showScreen('loginScreen');
 }
 
 // ===== CREATE KEY =====
 function createKey() {
     var username = document.getElementById('keyUser').value.trim() || 'User';
     var duration = document.getElementById('keyDuration').value;
-    var msg = document.getElementById('keyMsg'); msg.classList.remove('show');
+    var msg = document.getElementById('keyMsg'); 
+    msg.classList.remove('show');
     
-    var key = genKey(); var expiry = null; var durationText = '';
+    var key = genKey(); 
+    var expiry = null; 
+    var durationText = '';
+    
     switch(duration) {
         case '1h': expiry = Date.now() + 3600000; durationText = '1 Hour'; break;
         case '3h': expiry = Date.now() + 10800000; durationText = '3 Hours'; break;
@@ -321,25 +363,63 @@ function createKey() {
         case 'lifetime': expiry = 'lifetime'; durationText = 'Lifetime'; break;
     }
     
-    keys[key] = { username: username, hwid: null, duration: durationText, expiry: expiry, createdAt: Date.now() };
+    keys[key] = { 
+        username: username, 
+        hwid: null, 
+        duration: durationText, 
+        expiry: expiry, 
+        createdAt: Date.now() 
+    };
     saveKeys();
     
-    msg.textContent = '✅ Key: ' + key + ' (' + durationText + ') - Auto-lock on first use';
+    console.log('Key created:', key); // Debug
+    
+    msg.innerHTML = '✅ Key: <code style="color:#4a4;word-break:break-all">' + key + '</code> (' + durationText + ') - Auto-lock';
     msg.classList.add('show');
-    updateKeyList(); navigator.clipboard.writeText(key);
+    updateKeyList(); 
+    navigator.clipboard.writeText(key);
 }
 
 function updateKeyList() {
     var list = document.getElementById('keyList');
-    var active = Object.entries(keys).filter(function(e) { return e[1].expiry === 'lifetime' || Date.now() < e[1].expiry; });
-    if (active.length === 0) { list.innerHTML = '<p style="color:#444;font-size:11px;text-align:center">No active keys</p>'; return; }
+    var active = Object.entries(keys).filter(function(e) { 
+        return e[1].expiry === 'lifetime' || Date.now() < e[1].expiry; 
+    });
+    
+    if (active.length === 0) { 
+        list.innerHTML = '<p style="color:#444;font-size:11px;text-align:center">No active keys</p>'; 
+        return; 
+    }
+    
     list.innerHTML = active.map(function(e) {
-        var status = e[1].hwid ? '🔒 Locked' : '🔓 Open';
-        return '<div class="key-row"><span>' + e[0].substring(0,14) + '... | ' + e[1].username + ' | ' + e[1].duration + ' | ' + status + '</span><button onclick="deleteKey(\'' + e[0] + '\')">X</button></div>';
+        var key = e[0];
+        var data = e[1];
+        var status = data.hwid ? '🔒 Locked' : '🔓 Open';
+        var keyDisplay = key.substring(0, 16) + '...';
+        
+        return '<div class="key-row">' +
+            '<span class="key-text">' + keyDisplay + ' | ' + data.username + ' | ' + data.duration + ' | ' + status + '</span>' +
+            '<span class="key-actions">' +
+                '<button class="copy-key" onclick="copySingleKey(\'' + key + '\',this)">📋 Copy</button>' +
+                '<button onclick="deleteKey(\'' + key + '\')">X</button>' +
+            '</span>' +
+        '</div>';
     }).join('');
 }
 
-function deleteKey(k) { if (!isAdmin) return; delete keys[k]; saveKeys(); updateKeyList(); }
+function copySingleKey(key, btn) {
+    navigator.clipboard.writeText(key).then(function() {
+        btn.textContent = '✅ Copied!';
+        setTimeout(function() { btn.textContent = '📋 Copy'; }, 1500);
+    });
+}
+
+function deleteKey(k) { 
+    if (!isAdmin) return; 
+    delete keys[k]; 
+    saveKeys(); 
+    updateKeyList(); 
+}
 
 // ===== TABS =====
 function switchTab(tab, btn) {
@@ -360,24 +440,35 @@ function doBypass() {
         .then(function(d) {
             if (d.success && d.result) {
                 var clean = d.result;
-                if (typeof clean === 'string') { clean = clean.replace(/^\(['"](.+?)['"],\s*(True|False)\)$/, '$1'); clean = clean.replace(/^["'](.+?)["']$/, '$1'); }
+                if (typeof clean === 'string') { 
+                    clean = clean.replace(/^\(['"](.+?)['"],\s*(True|False)\)$/, '$1'); 
+                    clean = clean.replace(/^["'](.+?)["']$/, '$1'); 
+                }
                 document.getElementById('bpResult').textContent = clean;
                 document.getElementById('bpOutput').classList.add('show');
             }
         })
-        .catch(function() { document.getElementById('bpResult').textContent = 'Error connecting'; document.getElementById('bpOutput').classList.add('show'); });
+        .catch(function() { 
+            document.getElementById('bpResult').textContent = 'Error connecting'; 
+            document.getElementById('bpOutput').classList.add('show'); 
+        });
 }
 
 function copyText(id, btn) {
     var text = document.getElementById(id).textContent;
     if (!text) return;
     navigator.clipboard.writeText(text).then(function() {
-        var orig = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('green');
+        var orig = btn.textContent; 
+        btn.textContent = 'Copied!'; 
+        btn.classList.add('green');
         setTimeout(function() { btn.textContent = orig; btn.classList.remove('green'); }, 1500);
     });
 }
 
-function openBpResult() { var url = document.getElementById('bpResult').textContent; if (url && url.startsWith('http')) window.open(url, '_blank'); }
+function openBpResult() { 
+    var url = document.getElementById('bpResult').textContent; 
+    if (url && url.startsWith('http')) window.open(url, '_blank'); 
+}
 
 // ===== OBFUSCATOR =====
 function randomStr(len) {
@@ -450,6 +541,10 @@ function downloadObf() {
 
 // ===== STARTUP =====
 isAdmin = localStorage.getItem('ux_admin') === 'true';
+
+console.log('Starting up...'); // Debug
+console.log('Is admin:', isAdmin); // Debug
+console.log('Keys in storage:', keys); // Debug
 
 if (isAdmin) {
     enterMain(true);
