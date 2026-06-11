@@ -73,7 +73,7 @@
     <!-- LOGIN SCREEN -->
     <div class="screen active" id="loginScreen">
         <h1>🔐 Userfromxit</h1>
-        <p class="sub">HWID Protected System</p>
+        <p class="sub">Auto-Lock Key System</p>
         
         <div class="hwid-box">
             <label>🔒 Your HWID:</label>
@@ -85,7 +85,7 @@
         <button class="btn" onclick="userLogin()">Login</button>
         <div class="msg error" id="loginError"></div>
         
-        <p style="color:#333;font-size:10px;text-align:center;margin:10px 0">Don't have a key? Copy your HWID and send it on Discord</p>
+        <p style="color:#333;font-size:10px;text-align:center;margin:10px 0">First login locks the key to your PC</p>
         <button class="btn discord" onclick="window.open('https://discord.gg/SEU-SERVIDOR','_blank')">💬 Join Discord</button>
         <button class="btn" style="color:#333;font-size:11px;margin-top:10px" onclick="showScreen('adminLoginScreen')">Admin Panel</button>
     </div>
@@ -143,8 +143,8 @@
             <!-- ADMIN PANEL -->
             <div class="admin-section" id="adminPanel">
                 <h3>🔑 Create Key</h3>
-                <input type="text" id="keyHWID" placeholder="User HWID" autocomplete="off">
-                <input type="text" id="keyUser" placeholder="Username" autocomplete="off">
+                <p style="color:#555;font-size:10px;text-align:center;margin-bottom:12px">Key locks to first user who activates it</p>
+                <input type="text" id="keyUser" placeholder="Username (optional)">
                 <select id="keyDuration">
                     <option value="1h">1 Hour</option>
                     <option value="3h">3 Hours</option>
@@ -171,7 +171,7 @@
 
 <script>
 // ===== CONFIG =====
-var ADMIN = { user: 'Kph0019', pass: 'yurijoaokk1', code: '115500' };
+var ADMIN = { user: 'Userfromxit00', pass: 'wertyuiop', code: '115500' };
 var keys = JSON.parse(localStorage.getItem('ux_keys') || '{}');
 var isAdmin = false;
 
@@ -241,15 +241,21 @@ function userLogin() {
     var keyData = keys[key];
     if (!keyData) { err.textContent = 'Invalid key!'; err.classList.add('show'); return; }
     
-    if (keyData.hwid) {
-        if (keyData.hwid !== HWID) { err.textContent = 'This key is locked to another PC! HWID mismatch.'; err.classList.add('show'); return; }
-    } else {
-        keyData.hwid = HWID; keyData.firstUsed = Date.now(); saveKeys();
-    }
-    
     if (keyData.expiry !== 'lifetime' && Date.now() > keyData.expiry) {
         delete keys[key]; saveKeys();
         err.textContent = 'Key expired!'; err.classList.add('show'); return;
+    }
+    
+    if (!keyData.hwid) {
+        keyData.hwid = HWID;
+        keyData.firstUsed = Date.now();
+        saveKeys();
+    }
+    
+    if (keyData.hwid !== HWID) {
+        err.textContent = 'This key is already locked to another PC!';
+        err.classList.add('show');
+        return;
     }
     
     localStorage.setItem('ux_key', key);
@@ -297,12 +303,9 @@ function logoutAdmin() {
 
 // ===== CREATE KEY =====
 function createKey() {
-    var hwid = document.getElementById('keyHWID').value.trim();
     var username = document.getElementById('keyUser').value.trim() || 'User';
     var duration = document.getElementById('keyDuration').value;
     var msg = document.getElementById('keyMsg'); msg.classList.remove('show');
-    
-    if (!hwid) { alert('Please enter the user HWID!'); return; }
     
     var key = genKey(); var expiry = null; var durationText = '';
     switch(duration) {
@@ -318,9 +321,11 @@ function createKey() {
         case 'lifetime': expiry = 'lifetime'; durationText = 'Lifetime'; break;
     }
     
-    keys[key] = { username: username, hwid: hwid, duration: durationText, expiry: expiry, createdAt: Date.now() };
+    keys[key] = { username: username, hwid: null, duration: durationText, expiry: expiry, createdAt: Date.now() };
     saveKeys();
-    msg.textContent = 'Key: ' + key + ' (' + durationText + ')'; msg.classList.add('show');
+    
+    msg.textContent = '✅ Key: ' + key + ' (' + durationText + ') - Auto-lock on first use';
+    msg.classList.add('show');
     updateKeyList(); navigator.clipboard.writeText(key);
 }
 
@@ -329,7 +334,8 @@ function updateKeyList() {
     var active = Object.entries(keys).filter(function(e) { return e[1].expiry === 'lifetime' || Date.now() < e[1].expiry; });
     if (active.length === 0) { list.innerHTML = '<p style="color:#444;font-size:11px;text-align:center">No active keys</p>'; return; }
     list.innerHTML = active.map(function(e) {
-        return '<div class="key-row"><span>' + e[0].substring(0,14) + '... | ' + e[1].username + ' | ' + e[1].duration + '</span><button onclick="deleteKey(\'' + e[0] + '\')">X</button></div>';
+        var status = e[1].hwid ? '🔒 Locked' : '🔓 Open';
+        return '<div class="key-row"><span>' + e[0].substring(0,14) + '... | ' + e[1].username + ' | ' + e[1].duration + ' | ' + status + '</span><button onclick="deleteKey(\'' + e[0] + '\')">X</button></div>';
     }).join('');
 }
 
@@ -373,7 +379,7 @@ function copyText(id, btn) {
 
 function openBpResult() { var url = document.getElementById('bpResult').textContent; if (url && url.startsWith('http')) window.open(url, '_blank'); }
 
-// ===== OBFUSCATOR (HEAVY ONLY) =====
+// ===== OBFUSCATOR =====
 function randomStr(len) {
     var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     var str = '';
@@ -386,11 +392,9 @@ function doObfuscate() {
     if (!code) return;
     
     try {
-        // Remove comments
         code = code.replace(/--\[\[[\s\S]*?\]\]/g, '');
         code = code.replace(/--[^\n]*/g, '');
         
-        // Rename local variables
         var reserved = ['nil','true','false','and','or','not','local','function','if','then','else','elseif','end','for','while','do','repeat','until','return','break','in','goto'];
         var localRegex = /\blocal\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
         var match;
@@ -405,14 +409,10 @@ function doObfuscate() {
             code = code.replace(new RegExp('\\b' + safe + '\\b', 'g'), varMap[old]);
         }
         
-        // Convert to bytes
         var bytes = [];
-        for (var i = 0; i < code.length; i++) {
-            bytes.push('\\' + code.charCodeAt(i));
-        }
+        for (var i = 0; i < code.length; i++) bytes.push('\\' + code.charCodeAt(i));
         var encoded = bytes.join('');
         
-        // Split into table chunks
         var chunks = [];
         for (var i = 0; i < encoded.length; i += 50) {
             chunks.push('"' + encoded.substring(i, Math.min(i + 50, encoded.length)) + '"');
