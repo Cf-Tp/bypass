@@ -3,124 +3,467 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tools</title>
+    <title>Userfromxit</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        body{background:#000;font-family:Arial,Helvetica,sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;-webkit-user-select:none;user-select:none}
-        .box{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px;width:90%;max-width:500px;overflow:hidden}
-        .tabs{display:flex;border-bottom:1px solid #1a1a1a}
-        .tabs button{flex:1;padding:14px 10px;background:#050505;border:none;color:#444;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
-        .tabs button.active{color:#ccc;background:#0a0a0a;border-bottom:2px solid #555}
-        .tabs button:hover{color:#888}
-        .tab-content{padding:35px 30px;display:none}
-        .tab-content.active{display:block}
-        .icon{width:50px;height:50px;margin:0 auto 25px;border:1px solid #1a1a1a;border-radius:50%;display:flex;align-items:center;justify-content:center}
-        .icon svg{width:22px;height:22px;stroke:#555;fill:none;stroke-width:1.5}
-        h1{text-align:center;color:#ccc;font-size:20px;font-weight:normal;margin-bottom:5px}
-        .sub{text-align:center;color:#333;font-size:12px;margin-bottom:28px}
-        input,textarea{width:100%;padding:14px 15px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;font-size:14px;color:#ccc;outline:none;margin-bottom:12px;font-family:'Courier New',monospace}
-        textarea{min-height:200px;max-height:350px;resize:vertical;line-height:1.5}
+        body{background:#000;font-family:Arial,Helvetica,sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+        
+        .container{width:90%;max-width:500px}
+        
+        .screen{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px;padding:35px 30px;display:none}
+        .screen.active{display:block}
+        
+        h1{text-align:center;color:#ccc;font-size:20px;margin-bottom:5px}
+        .sub{text-align:center;color:#333;font-size:12px;margin-bottom:25px}
+        
+        input,textarea,select{width:100%;padding:14px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;font-size:14px;color:#ccc;outline:none;margin-bottom:12px;font-family:'Courier New',monospace}
+        textarea{min-height:200px;max-height:300px;resize:vertical;line-height:1.5}
+        select{appearance:none;cursor:pointer;text-align:center;text-align-last:center}
         input::placeholder,textarea::placeholder{color:#333}
-        input:focus,textarea:focus{border-color:#333}
-        .btn{width:100%;padding:14px;background:#111;border:1px solid #1a1a1a;border-radius:12px;color:#888;font-size:14px;cursor:pointer;margin-bottom:15px;transition:all .2s}
+        input:focus,textarea:focus,select:focus{border-color:#555}
+        
+        .btn{width:100%;padding:14px;background:#111;border:1px solid #1a1a1a;border-radius:12px;color:#888;font-size:14px;cursor:pointer;margin-bottom:10px;transition:.2s;display:block;text-align:center}
         .btn:hover{background:#161616;color:#fff}
-        .btn:disabled{opacity:.4;cursor:default}
-        .loading{display:none;text-align:center;color:#333;font-size:12px;margin-bottom:15px}
-        .loading.show{display:block}
-        .error{display:none;padding:12px;background:#0a0000;border:1px solid #1a0000;border-radius:10px;color:#944;font-size:13px;margin-bottom:15px}
-        .error.show{display:block}
-        .result{display:none;padding:15px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px}
-        .result.show{display:block}
-        .result .out{color:#888;font-size:13px;word-break:break-all;margin-bottom:12px;max-height:220px;overflow-y:auto;font-family:'Courier New',monospace;line-height:1.5;white-space:pre-wrap;background:#050505;padding:12px;border-radius:8px}
-        .result .out::-webkit-scrollbar{width:3px}
-        .result .out::-webkit-scrollbar-track{background:transparent}
-        .result .out::-webkit-scrollbar-thumb{background:#1a1a1a;border-radius:3px}
-        .result .btns{display:flex;gap:8px}
-        .result .btns button{flex:1;padding:11px;font-size:12px;margin-bottom:0}
-        .copied{border-color:#1a3a1a!important;color:#4a4!important}
+        .btn.green{background:#0a1a0a;border-color:#1a3a1a;color:#4a4}
+        .btn.green:hover{background:#0f1f0f;color:#6f6}
+        .btn.red{background:#1a0a0a;border-color:#1a0000;color:#944}
+        .btn.discord{background:#5865F2;border-color:#5865F2;color:#fff}
+        .btn.small{width:auto;padding:6px 14px;font-size:10px;margin:0;display:inline-block}
+        
+        .msg{display:none;padding:10px;border-radius:8px;font-size:12px;margin-bottom:10px;word-break:break-all}
+        .msg.error{background:#0a0000;border:1px solid #1a0000;color:#f44}
+        .msg.success{background:#000a00;border:1px solid #001a00;color:#4a4}
+        .msg.show{display:block}
+        
+        .hwid-box{background:#050505;border:1px solid #1a1a1a;border-radius:10px;padding:12px;margin-bottom:15px}
+        .hwid-box label{color:#555;font-size:11px;display:block;margin-bottom:5px}
+        .hwid-box code{color:#888;font-size:11px;word-break:break-all;user-select:all}
+        .hwid-box .cpy{background:none;border:1px solid #1a1a1a;color:#555;font-size:10px;padding:4px 10px;border-radius:5px;cursor:pointer;margin-top:8px;display:inline-block}
+        
+        .key-list{max-height:200px;overflow-y:auto;margin-top:10px}
+        .key-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#050505;border-radius:6px;margin-bottom:4px;font-size:10px;color:#666}
+        .key-row span{flex:1}
+        .key-row button{background:none;border:1px solid #1a0000;color:#944;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px;margin-left:8px}
+        
+        .tabs{display:flex;gap:0;margin-bottom:20px}
+        .tabs button{flex:1;padding:12px;background:#050505;border:1px solid #1a1a1a;color:#444;font-size:12px;cursor:pointer}
+        .tabs button:first-child{border-radius:10px 0 0 10px}
+        .tabs button:last-child{border-radius:0 10px 10px 0}
+        .tabs button.active{background:#0a0a0a;color:#ccc}
+        
+        .tab-content{display:none}
+        .tab-content.active{display:block}
+        
+        .output-box{background:#050505;border:1px solid #1a1a1a;border-radius:10px;padding:12px;margin-top:10px;max-height:250px;overflow-y:auto;display:none}
+        .output-box.show{display:block}
+        .output-box pre{color:#888;font-size:12px;white-space:pre-wrap;word-break:break-all;font-family:'Courier New',monospace;line-height:1.5;margin:0}
+        
+        .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+        .top-bar span{color:#555;font-size:11px}
+        
+        .admin-section{margin-top:25px;padding:20px;background:#050505;border:1px solid #1a1a1a;border-radius:12px;display:none}
+        .admin-section.show{display:block}
+        .admin-section h3{color:#ccc;font-size:14px;text-align:center;margin-bottom:15px}
     </style>
 </head>
 <body>
-    <div class="box">
-        <div class="tabs">
-            <button class="active" id="tabBypassBtn">Bypass</button>
-            <button id="tabObfBtn">Lua Obfuscator</button>
+
+<div class="container">
+
+    <!-- LOGIN SCREEN -->
+    <div class="screen active" id="loginScreen">
+        <h1>🔐 Userfromxit</h1>
+        <p class="sub">HWID Protected System</p>
+        
+        <div class="hwid-box">
+            <label>🔒 Your HWID:</label>
+            <code id="hwidText">Generating...</code>
+            <button class="cpy" onclick="copyHWID()">📋 Copy HWID</button>
         </div>
+        
+        <input type="text" id="keyInput" placeholder="Enter your key..." autocomplete="off">
+        <button class="btn" onclick="userLogin()">Login</button>
+        <div class="msg error" id="loginError"></div>
+        
+        <p style="color:#333;font-size:10px;text-align:center;margin:10px 0">Don't have a key? Copy your HWID and send it on Discord</p>
+        <button class="btn discord" onclick="window.open('https://discord.gg/SEU-SERVIDOR','_blank')">💬 Join Discord</button>
+        <button class="btn" style="color:#333;font-size:11px;margin-top:10px" onclick="showScreen('adminLoginScreen')">Admin Panel</button>
+    </div>
+    
+    <!-- ADMIN LOGIN -->
+    <div class="screen" id="adminLoginScreen">
+        <h1>⚙️ Admin Login</h1>
+        <p class="sub">Enter your credentials</p>
+        
+        <input type="text" id="adminUser" placeholder="Username" autocomplete="off">
+        <input type="password" id="adminPass" placeholder="Password">
+        <input type="text" id="adminCode" placeholder="Security Code" autocomplete="off">
+        <button class="btn" onclick="adminLogin()">Login</button>
+        <div class="msg error" id="adminError"></div>
+        <button class="btn" style="color:#333;font-size:11px" onclick="showScreen('loginScreen')">Back</button>
+    </div>
+
+    <!-- MAIN SCREEN -->
+    <div class="screen" id="mainScreen">
+        <div class="top-bar">
+            <span id="userLabel">Welcome</span>
+            <button class="btn red small" onclick="doLogout()">Logout</button>
+        </div>
+        
+        <div class="tabs">
+            <button class="active" onclick="switchTab('bypass',this)">Bypass</button>
+            <button onclick="switchTab('obf',this)">Lua Obfuscator</button>
+        </div>
+        
+        <!-- BYPASS -->
         <div class="tab-content active" id="tabBypass">
-            <div class="icon"><svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg></div>
-            <h1>Link Bypasser</h1>
-            <p class="sub">Paste your link to get started</p>
             <input type="text" id="bpUrl" placeholder="Paste link here..." autocomplete="off">
-            <button class="btn" id="bpBtn">Bypass</button>
-            <div class="loading" id="bpLoad">Processing...</div>
-            <div class="error" id="bpErr"></div>
-            <div class="result" id="bpOut">
-                <div class="out" id="bpResult"></div>
-                <div class="btns">
-                    <button id="bpCopy">Copy</button>
-                    <button id="bpOpen">Open</button>
+            <button class="btn" onclick="doBypass()">Bypass</button>
+            <div class="output-box" id="bpOutput">
+                <pre id="bpResult"></pre>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                    <button class="btn small" style="flex:1;font-size:11px;margin:0" onclick="copyText('bpResult',this)">Copy</button>
+                    <button class="btn small" style="flex:1;font-size:11px;margin:0" onclick="openBpResult()">Open</button>
                 </div>
             </div>
         </div>
+        
+        <!-- LUA OBFUSCATOR -->
         <div class="tab-content" id="tabObf">
-            <div class="icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke-linecap="round"/></svg></div>
-            <h1>Lua Obfuscator</h1>
-            <p class="sub">Paste your Lua code to obfuscate</p>
             <textarea id="obfInput" placeholder="Paste your Lua code here..." spellcheck="false"></textarea>
-            <button class="btn" id="obfBtn">Obfuscate</button>
-            <div class="loading" id="obfLoad">Obfuscating...</div>
-            <div class="error" id="obfErr"></div>
-            <div class="result" id="obfOut">
-                <div class="out" id="obfResult"></div>
-                <div class="btns">
-                    <button id="obfCopy">Copy</button>
-                    <button id="obfDownload">Download .lua</button>
+            <button class="btn" onclick="doObfuscate()">Obfuscate</button>
+            <div class="output-box" id="obfOutput">
+                <pre id="obfResult"></pre>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                    <button class="btn small" style="flex:1;font-size:11px;margin:0" onclick="copyText('obfResult',this)">Copy</button>
+                    <button class="btn small" style="flex:1;font-size:11px;margin:0" onclick="downloadObf()">Download</button>
                 </div>
+            </div>
+            
+            <!-- ADMIN PANEL -->
+            <div class="admin-section" id="adminPanel">
+                <h3>🔑 Create Key</h3>
+                <input type="text" id="keyHWID" placeholder="User HWID" autocomplete="off">
+                <input type="text" id="keyUser" placeholder="Username" autocomplete="off">
+                <select id="keyDuration">
+                    <option value="1h">1 Hour</option>
+                    <option value="3h">3 Hours</option>
+                    <option value="6h">6 Hours</option>
+                    <option value="12h">12 Hours</option>
+                    <option value="1d">1 Day</option>
+                    <option value="3d">3 Days</option>
+                    <option value="7d">7 Days</option>
+                    <option value="14d">14 Days</option>
+                    <option value="30d">30 Days</option>
+                    <option value="lifetime">Lifetime</option>
+                </select>
+                <button class="btn green" onclick="createKey()">Create Key</button>
+                <div class="msg success" id="keyMsg"></div>
+                
+                <h3 style="color:#ccc;font-size:13px;text-align:center;margin-top:20px;margin-bottom:10px">📋 Active Keys</h3>
+                <div class="key-list" id="keyList"></div>
+                <button class="btn red" onclick="logoutAdmin()" style="margin-top:15px">Exit Admin</button>
             </div>
         </div>
     </div>
-    <script>
-    (function(){
-        var _0x='Tabs|Btn|Bypass|Obf|tab|active|bypass|obfuscator|addEventListener|contextmenu|preventDefault|keydown|keyCode|ctrlKey|shiftKey|outerWidth|innerWidth|outerHeight|innerHeight|location|replace|about:blank|body|innerHTML|console|clear|setInterval|log|info|warn|error'.split('|');
-        var _1={};
-        for(var i=0;i<_0x.length;i++)_1[_0x[i]]=_0x[i];
 
-        document[_1.addEventListener](_1.contextmenu,function(e){e[_1.preventDefault]()});
-        document[_1.addEventListener](_1.keydown,function(e){if(e[_1.keyCode]==123||(e[_1.ctrlKey]&&e[_1.shiftKey]&&(e[_1.keyCode]==73||e[_1.keyCode]==74))||(e[_1.ctrlKey]&&e[_1.keyCode]==85)){e[_1.preventDefault]()}});
-        setInterval(function(){if(window[_1.outerWidth]-window[_1.innerWidth]>160||window[_1.outerHeight]-window[_1.innerHeight]>160){document[_1.body][_1.innerHTML]='';window[_1.location][_1.replace]('about:blank')}},1000);
-        setInterval(function(){debugger},500);
-        console[_1.clear]();setInterval(console[_1.clear],1000);
-        console[_1.log]=console[_1.info]=console[_1.warn]=console[_1.error]=function(){};
-        if(window.top!==window.self)window.top[_1.location]=window[_1.location];
+</div>
 
-        document.getElementById('tabBypassBtn')[_1.addEventListener]('click',function(){document.getElementById('tabBypassBtn').classList.add(_1.active);document.getElementById('tabObfBtn').classList.remove(_1.active);document.getElementById('tab'+_1.Bypass).classList.add(_1.active);document.getElementById('tab'+_1.Obf).classList.remove(_1.active)});
-        document.getElementById('tabObfBtn')[_1.addEventListener]('click',function(){document.getElementById('tabObfBtn').classList.add(_1.active);document.getElementById('tabBypassBtn').classList.remove(_1.active);document.getElementById('tab'+_1.Obf).classList.add(_1.active);document.getElementById('tab'+_1.Bypass).classList.remove(_1.active)});
+<script>
+// ===== CONFIG =====
+var ADMIN = { user: 'Kph0019', pass: 'yurijoaokk1', code: '115500' };
+var keys = JSON.parse(localStorage.getItem('ux_keys') || '{}');
+var isAdmin = false;
 
-        // Bypass
-        (function(){
-            var u=document.getElementById('bpUrl'),b=document.getElementById('bpBtn'),l=document.getElementById('bpLoad'),e=document.getElementById('bpErr'),o=document.getElementById('bpOut'),r=document.getElementById('bpResult'),c=document.getElementById('bpCopy'),p=document.getElementById('bpOpen');
-            function v(s){return s.indexOf('http')===0||s.indexOf('https')===0}
-            b[_1.addEventListener]('click',function(){var x=u.value.trim();if(!x){e[_1.innerHTML]='Please enter a link';e.className='error show';return}if(!v(x)){e[_1.innerHTML]='Invalid link';e.className='error show';return}b.disabled=true;b[_1.innerHTML]='Processing...';l.className='loading show';o.className='result';e.className='error';
-            fetch('https://trw.lat/api/bypass?apikey=TRW_FREE-GAY-15a92945-9b04-4c75-8337-f2a6007281e9&url='+encodeURIComponent(x))
-            .then(function(r){return r.json()}).then(function(d){if(d.success&&d.result){var cl=d.result;if(typeof cl==='string'){cl=cl.replace(/^\\(['\"](.+?)['\"],\\s*(True|False)\\)$/,'$1');cl=cl.replace(/^[\"'](.+?)[\"']$/,'$1')}r[_1.innerHTML]=cl;o.className='result show';c.click()}else{e[_1.innerHTML]='Unable to process';e.className='error show'}})
-            .catch(function(){e[_1.innerHTML]='Connection error';e.className='error show'})
-            .finally(function(){b.disabled=false;b[_1.innerHTML]=_1.Bypass;l.className='loading'})});
-            c[_1.addEventListener]('click',function(){var t=r[_1.innerHTML];if(!t)return;navigator.clipboard.writeText(t).then(function(){c[_1.innerHTML]='Copied!';c.className='copied';setTimeout(function(){c[_1.innerHTML]='Copy';c.className=''},1500)})});
-            p[_1.addEventListener]('click',function(){var x=r[_1.innerHTML];if(x&&v(x))window.open(x,'_blank')});
-            u[_1.addEventListener]('keypress',function(e){if(e.key==='Enter')b.click()});
-        })();
+// ===== HWID =====
+function genHWID() {
+    var data = [
+        navigator.userAgent,
+        navigator.language,
+        screen.width + 'x' + screen.height,
+        screen.colorDepth,
+        new Date().getTimezoneOffset(),
+        navigator.hardwareConcurrency || 4,
+        navigator.deviceMemory || 4
+    ].join('||');
+    
+    var hash = 0;
+    for (var i = 0; i < data.length; i++) {
+        hash = ((hash << 5) - hash) + data.charCodeAt(i);
+        hash = hash & hash;
+    }
+    
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var result = 'HWID-';
+    var seed = Math.abs(hash);
+    for (var i = 0; i < 16; i++) {
+        seed = (seed * 16807 + 0) % 2147483647;
+        result += chars.charAt(seed % chars.length);
+    }
+    return result;
+}
 
-        // Obfuscator
-        (function(){
-            var i=document.getElementById('obfInput'),b=document.getElementById('obfBtn'),l=document.getElementById('obfLoad'),e=document.getElementById('obfErr'),o=document.getElementById('obfOut'),r=document.getElementById('obfResult'),c=document.getElementById('obfCopy'),d=document.getElementById('obfDownload');
-            function obf(code){code=code.replace(/--\[\[[\s\S]*?\]\]/g,'');code=code.replace(/--[^\n]*/g,'');var bytes=[];for(var i=0;i<code.length;i++)bytes.push('\\'+code.charCodeAt(i));var enc=bytes.join('');var chunks=[];for(var i=0;i<enc.length;i+=60)chunks.push('"'+enc.substring(i,Math.min(i+60,enc.length))+'"');return'local t={'+chunks.join(';')+'}\nlocal r=""\nfor i=1,#t do r=r..t[i] end\nlocal f=loadstring(r)\nf()'}
-            b[_1.addEventListener]('click',function(){var v=i.value.trim();if(!v){e[_1.innerHTML]='Please paste Lua code';e.className='error show';return}b.disabled=true;b[_1.innerHTML]='Obfuscating...';l.className='loading show';o.className='result';e.className='error';
-            setTimeout(function(){try{var x=obf(v);if(x.length<10){e[_1.innerHTML]='Could not obfuscate';e.className='error show'}else{r[_1.innerHTML]=x;o.className='result show'}}catch(ex){e[_1.innerHTML]='Error: '+ex.message;e.className='error show'}b.disabled=false;b[_1.innerHTML]='Obfuscate';l.className='loading'},200)});
-            c[_1.addEventListener]('click',function(){var t=r[_1.innerHTML];if(!t)return;navigator.clipboard.writeText(t).then(function(){c[_1.innerHTML]='Copied!';c.className='copied';setTimeout(function(){c[_1.innerHTML]='Copy';c.className=''},1500)})});
-            d[_1.addEventListener]('click',function(){var t=r[_1.innerHTML];if(!t)return;var bl=new Blob([t],{type:'text/plain'});var url=URL.createObjectURL(bl);var a=document.createElement('a');a.href=url;a.download='obfuscated.lua';a.click();URL.revokeObjectURL(url);d[_1.innerHTML]='Downloaded!';d.className='copied';setTimeout(function(){d[_1.innerHTML]='Download .lua';d.className=''},1500)});
-            i[_1.addEventListener]('keydown',function(e){if(e.key==='Tab'){e[_1.preventDefault]();var s=this.selectionStart;this.value=this.value.substring(0,s)+'    '+this.value.substring(this.selectionEnd);this.selectionStart=this.selectionEnd=s+4}});
-        })();
-    })();
-    </script>
+var HWID = genHWID();
+document.getElementById('hwidText').textContent = HWID;
+
+function copyHWID() {
+    navigator.clipboard.writeText(HWID).then(function() {
+        var btn = document.querySelector('.cpy');
+        btn.textContent = '✅ Copied!';
+        setTimeout(function() { btn.textContent = '📋 Copy HWID'; }, 1500);
+    });
+}
+
+// ===== SCREENS =====
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+}
+
+// ===== KEYS =====
+function saveKeys() { localStorage.setItem('ux_keys', JSON.stringify(keys)); }
+
+function genKey() {
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var key = 'UX-';
+    for (var i = 0; i < 20; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
+    return key;
+}
+
+// ===== USER LOGIN =====
+function userLogin() {
+    var key = document.getElementById('keyInput').value.trim();
+    var err = document.getElementById('loginError');
+    err.classList.remove('show');
+    
+    if (!key) { err.textContent = 'Please enter a key!'; err.classList.add('show'); return; }
+    
+    var keyData = keys[key];
+    if (!keyData) { err.textContent = 'Invalid key!'; err.classList.add('show'); return; }
+    
+    if (keyData.hwid) {
+        if (keyData.hwid !== HWID) { err.textContent = 'This key is locked to another PC! HWID mismatch.'; err.classList.add('show'); return; }
+    } else {
+        keyData.hwid = HWID; keyData.firstUsed = Date.now(); saveKeys();
+    }
+    
+    if (keyData.expiry !== 'lifetime' && Date.now() > keyData.expiry) {
+        delete keys[key]; saveKeys();
+        err.textContent = 'Key expired!'; err.classList.add('show'); return;
+    }
+    
+    localStorage.setItem('ux_key', key);
+    enterMain(false, keyData);
+}
+
+document.getElementById('keyInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') userLogin(); });
+
+// ===== ADMIN LOGIN =====
+function adminLogin() {
+    var u = document.getElementById('adminUser').value.trim();
+    var p = document.getElementById('adminPass').value.trim();
+    var c = document.getElementById('adminCode').value.trim();
+    var err = document.getElementById('adminError');
+    err.classList.remove('show');
+    
+    if (u === ADMIN.user && p === ADMIN.pass && c === ADMIN.code) {
+        localStorage.setItem('ux_admin', 'true'); isAdmin = true; enterMain(true);
+    } else {
+        err.textContent = 'Invalid credentials!'; err.classList.add('show');
+    }
+}
+
+// ===== ENTER MAIN =====
+function enterMain(admin, keyData) {
+    showScreen('mainScreen');
+    if (admin) {
+        document.getElementById('userLabel').textContent = '👑 Admin | Unlimited';
+        document.getElementById('adminPanel').classList.add('show'); updateKeyList();
+    } else {
+        document.getElementById('userLabel').textContent = '👤 ' + (keyData ? keyData.username : 'User') + ' | ' + (keyData ? keyData.duration : 'Active');
+        document.getElementById('adminPanel').classList.remove('show');
+    }
+}
+
+function doLogout() {
+    localStorage.removeItem('ux_key'); document.getElementById('adminPanel').classList.remove('show');
+    showScreen('loginScreen'); document.getElementById('keyInput').value = '';
+}
+
+function logoutAdmin() {
+    localStorage.removeItem('ux_admin'); isAdmin = false;
+    document.getElementById('adminPanel').classList.remove('show'); showScreen('loginScreen');
+}
+
+// ===== CREATE KEY =====
+function createKey() {
+    var hwid = document.getElementById('keyHWID').value.trim();
+    var username = document.getElementById('keyUser').value.trim() || 'User';
+    var duration = document.getElementById('keyDuration').value;
+    var msg = document.getElementById('keyMsg'); msg.classList.remove('show');
+    
+    if (!hwid) { alert('Please enter the user HWID!'); return; }
+    
+    var key = genKey(); var expiry = null; var durationText = '';
+    switch(duration) {
+        case '1h': expiry = Date.now() + 3600000; durationText = '1 Hour'; break;
+        case '3h': expiry = Date.now() + 10800000; durationText = '3 Hours'; break;
+        case '6h': expiry = Date.now() + 21600000; durationText = '6 Hours'; break;
+        case '12h': expiry = Date.now() + 43200000; durationText = '12 Hours'; break;
+        case '1d': expiry = Date.now() + 86400000; durationText = '1 Day'; break;
+        case '3d': expiry = Date.now() + 259200000; durationText = '3 Days'; break;
+        case '7d': expiry = Date.now() + 604800000; durationText = '7 Days'; break;
+        case '14d': expiry = Date.now() + 1209600000; durationText = '14 Days'; break;
+        case '30d': expiry = Date.now() + 2592000000; durationText = '30 Days'; break;
+        case 'lifetime': expiry = 'lifetime'; durationText = 'Lifetime'; break;
+    }
+    
+    keys[key] = { username: username, hwid: hwid, duration: durationText, expiry: expiry, createdAt: Date.now() };
+    saveKeys();
+    msg.textContent = 'Key: ' + key + ' (' + durationText + ')'; msg.classList.add('show');
+    updateKeyList(); navigator.clipboard.writeText(key);
+}
+
+function updateKeyList() {
+    var list = document.getElementById('keyList');
+    var active = Object.entries(keys).filter(function(e) { return e[1].expiry === 'lifetime' || Date.now() < e[1].expiry; });
+    if (active.length === 0) { list.innerHTML = '<p style="color:#444;font-size:11px;text-align:center">No active keys</p>'; return; }
+    list.innerHTML = active.map(function(e) {
+        return '<div class="key-row"><span>' + e[0].substring(0,14) + '... | ' + e[1].username + ' | ' + e[1].duration + '</span><button onclick="deleteKey(\'' + e[0] + '\')">X</button></div>';
+    }).join('');
+}
+
+function deleteKey(k) { if (!isAdmin) return; delete keys[k]; saveKeys(); updateKeyList(); }
+
+// ===== TABS =====
+function switchTab(tab, btn) {
+    document.querySelectorAll('.tabs button').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('tabBypass').classList.toggle('active', tab === 'bypass');
+    document.getElementById('tabObf').classList.toggle('active', tab === 'obf');
+}
+
+// ===== BYPASS =====
+function doBypass() {
+    var url = document.getElementById('bpUrl').value.trim();
+    if (!url) return;
+    document.getElementById('bpOutput').classList.remove('show');
+    
+    fetch('https://trw.lat/api/bypass?apikey=TRW_FREE-GAY-15a92945-9b04-4c75-8337-f2a6007281e9&url=' + encodeURIComponent(url))
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            if (d.success && d.result) {
+                var clean = d.result;
+                if (typeof clean === 'string') { clean = clean.replace(/^\(['"](.+?)['"],\s*(True|False)\)$/, '$1'); clean = clean.replace(/^["'](.+?)["']$/, '$1'); }
+                document.getElementById('bpResult').textContent = clean;
+                document.getElementById('bpOutput').classList.add('show');
+            }
+        })
+        .catch(function() { document.getElementById('bpResult').textContent = 'Error connecting'; document.getElementById('bpOutput').classList.add('show'); });
+}
+
+function copyText(id, btn) {
+    var text = document.getElementById(id).textContent;
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(function() {
+        var orig = btn.textContent; btn.textContent = 'Copied!'; btn.classList.add('green');
+        setTimeout(function() { btn.textContent = orig; btn.classList.remove('green'); }, 1500);
+    });
+}
+
+function openBpResult() { var url = document.getElementById('bpResult').textContent; if (url && url.startsWith('http')) window.open(url, '_blank'); }
+
+// ===== OBFUSCATOR (HEAVY ONLY) =====
+function randomStr(len) {
+    var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var str = '';
+    for (var i = 0; i < len; i++) str += chars.charAt(Math.floor(Math.random() * chars.length));
+    return str;
+}
+
+function doObfuscate() {
+    var code = document.getElementById('obfInput').value.trim();
+    if (!code) return;
+    
+    try {
+        // Remove comments
+        code = code.replace(/--\[\[[\s\S]*?\]\]/g, '');
+        code = code.replace(/--[^\n]*/g, '');
+        
+        // Rename local variables
+        var reserved = ['nil','true','false','and','or','not','local','function','if','then','else','elseif','end','for','while','do','repeat','until','return','break','in','goto'];
+        var localRegex = /\blocal\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
+        var match;
+        var varMap = {};
+        while ((match = localRegex.exec(code)) !== null) {
+            if (reserved.indexOf(match[1]) === -1 && match[1].length > 1 && !varMap[match[1]]) {
+                varMap[match[1]] = randomStr(10);
+            }
+        }
+        for (var old in varMap) {
+            var safe = old.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            code = code.replace(new RegExp('\\b' + safe + '\\b', 'g'), varMap[old]);
+        }
+        
+        // Convert to bytes
+        var bytes = [];
+        for (var i = 0; i < code.length; i++) {
+            bytes.push('\\' + code.charCodeAt(i));
+        }
+        var encoded = bytes.join('');
+        
+        // Split into table chunks
+        var chunks = [];
+        for (var i = 0; i < encoded.length; i += 50) {
+            chunks.push('"' + encoded.substring(i, Math.min(i + 50, encoded.length)) + '"');
+        }
+        
+        var v1 = 't' + randomStr(6);
+        var v2 = 'r' + randomStr(6);
+        var v3 = 'i' + randomStr(6);
+        var v4 = 'f' + randomStr(5);
+        
+        var result = 'local ' + v1 + '={' + chunks.join(';') + '}\n';
+        result += 'local ' + v2 + '=""\n';
+        result += 'for ' + v3 + '=1,#' + v1 + ' do ' + v2 + '=' + v2 + '..' + v1 + '[' + v3 + '] end\n';
+        result += 'local ' + v4 + '=loadstring(' + v2 + ')\n';
+        result += v4 + '()';
+        
+        document.getElementById('obfResult').textContent = result;
+        document.getElementById('obfOutput').classList.add('show');
+    } catch(e) {
+        document.getElementById('obfResult').textContent = 'Error: ' + e.message;
+        document.getElementById('obfOutput').classList.add('show');
+    }
+}
+
+function downloadObf() {
+    var text = document.getElementById('obfResult').textContent;
+    if (!text) return;
+    var blob = new Blob([text], { type: 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'obfuscated.lua';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// ===== STARTUP =====
+isAdmin = localStorage.getItem('ux_admin') === 'true';
+
+if (isAdmin) {
+    enterMain(true);
+} else {
+    var savedKey = localStorage.getItem('ux_key');
+    if (savedKey && keys[savedKey]) {
+        var kd = keys[savedKey];
+        if ((kd.expiry === 'lifetime' || Date.now() < kd.expiry) && kd.hwid === HWID) {
+            enterMain(false, kd);
+        } else {
+            localStorage.removeItem('ux_key');
+        }
+    }
+}
+</script>
 </body>
 </html>
