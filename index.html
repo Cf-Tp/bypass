@@ -8,10 +8,19 @@
         *{margin:0;padding:0;box-sizing:border-box}
         body{background:#000;font-family:Arial,Helvetica,sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
         
-        .box{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px;width:90%;max-width:500px;overflow:hidden}
+        .verify-screen{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px;padding:40px 30px;width:90%;max-width:400px;text-align:center;display:none}
+        .verify-screen.show{display:block}
+        .verify-screen h1{color:#ccc;font-size:20px;margin-bottom:8px}
+        .verify-screen .sub{color:#333;font-size:12px;margin-bottom:30px}
+        .verify-screen .g-recaptcha{display:flex;justify-content:center;margin-bottom:20px}
+        .verify-screen .err{display:none;padding:10px;background:#0a0000;border:1px solid #1a0000;border-radius:8px;color:#944;font-size:12px;margin-top:15px}
+        .verify-screen .err.show{display:block}
         
-        .tabs{display:flex;border-bottom:1px solid #1a1a1a}
-        .tabs button{flex:1;padding:14px 10px;background:#050505;border:none;color:#444;font-size:13px;cursor:pointer;border-bottom:2px solid transparent}
+        .box{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px;width:90%;max-width:500px;overflow:hidden;display:none}
+        .box.show{display:block}
+        
+        .tabs{display:flex;border-bottom:1px solid #1a1a1a;overflow-x:auto}
+        .tabs button{flex:1;padding:14px 8px;background:#050505;border:none;color:#444;font-size:11px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
         .tabs button.active{color:#ccc;background:#0a0a0a;border-bottom:2px solid #555}
         
         .tab-content{padding:30px;display:none}
@@ -26,233 +35,273 @@
         
         .btn{width:100%;padding:14px;background:#111;border:1px solid #1a1a1a;border-radius:12px;color:#888;font-size:14px;cursor:pointer;margin-bottom:10px;transition:.2s;text-align:center;display:block}
         .btn:hover{background:#161616;color:#fff}
+        .btn:disabled{opacity:.4}
         .btn.small{flex:1;padding:10px;font-size:11px;margin-bottom:0}
         
-        .result-box{background:#050505;border:1px solid #1a1a1a;border-radius:10px;padding:12px;margin-top:10px;max-height:250px;overflow-y:auto;display:none}
+        .result-box{background:#050505;border:1px solid #1a1a1a;border-radius:10px;padding:12px;margin-top:10px;max-height:300px;overflow-y:auto;display:none}
         .result-box.show{display:block}
         .result-box pre{color:#888;font-size:12px;white-space:pre-wrap;word-break:break-all;font-family:'Courier New',monospace;line-height:1.5;margin:0 0 10px 0}
-        .result-box .btns{display:flex;gap:8px}
-        .copied{background:#0a1a0a!important;border-color:#1a3a1a!important;color:#4a4!important}
+        .btns{display:flex;gap:8px}
+        
+        .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+        .stat-card{background:#050505;border:1px solid #1a1a1a;border-radius:10px;padding:15px;text-align:center}
+        .stat-card .number{font-size:28px;font-weight:bold;color:#4a4;margin-bottom:5px}
+        .stat-card .label{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1px}
+        .stat-card.blue .number{color:#66a}
+        .stat-card.purple .number{color:#a6a}
+        .stat-card.gold .number{color:#aa6}
+        
+        .stat-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #111;font-size:11px;color:#666}
+        .stat-row:last-child{border-bottom:none}
+        .stat-row span:last-child{color:#888}
+        
+        .live-dot{display:inline-block;width:8px;height:8px;background:#4a4;border-radius:50%;margin-right:5px;animation:pulse 1s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+        
+        .visitor-list{max-height:200px;overflow-y:auto;margin-top:10px}
+        .visitor-item{display:flex;justify-content:space-between;padding:6px 0;font-size:10px;color:#555;border-bottom:1px solid #0d0d0d}
+        
+        .download-card{background:#0a0a1a;border:1px solid #1a1a3a;border-radius:16px;padding:25px;text-align:center;margin-top:10px}
+        .download-card .d-icon{width:80px;height:80px;margin:0 auto 20px;border-radius:20px;display:flex;align-items:center;justify-content:center}
+        .download-card .d-icon img{width:100%;height:100%;border-radius:20px;object-fit:contain}
+        .download-card h2{color:#ccc;font-size:18px;margin-bottom:5px}
+        .download-card .ver{color:#555;font-size:11px;margin-bottom:15px}
+        .download-card .d-btn{display:inline-block;padding:14px 30px;background:#1a1a3a;border:1px solid #2a2a5a;border-radius:10px;color:#88f;font-size:14px;text-decoration:none;transition:.2s;width:auto}
+        .download-card .d-btn:hover{background:#2a2a5a;color:#aaf}
     </style>
 </head>
 <body>
-    <div class="box" id="mainBox">
-        <div class="tabs">
-            <button class="active" id="tabBtn1">Bypass</button>
-            <button id="tabBtn2">Lua Obfuscator</button>
-        </div>
-        
-        <!-- BYPASS TAB -->
-        <div class="tab-content active" id="tab1">
-            <h1>Link Bypasser</h1>
-            <p class="sub">Paste your link to get started</p>
-            <input type="text" id="bpUrl" placeholder="Paste link here..." autocomplete="off">
-            <button class="btn" id="bpBtn">Bypass</button>
-            <div class="result-box" id="bpResultBox">
-                <pre id="bpResultText"></pre>
-                <div class="btns">
-                    <button class="btn small" id="bpCopyBtn">Copy</button>
-                    <button class="btn small" id="bpOpenBtn">Open</button>
-                </div>
+
+<!-- TELA DE VERIFICAÇÃO -->
+<div class="verify-screen show" id="verifyScreen">
+    <h1>🔐 Userfromxit</h1>
+    <p class="sub">Verify to continue</p>
+    <div class="g-recaptcha" id="recaptchaBox"></div>
+    <div class="err" id="verifyErr"></div>
+</div>
+
+<!-- SITE PRINCIPAL -->
+<div class="box" id="mainBox">
+    <div class="tabs">
+        <button class="active" onclick="switchTab(0,this)">Bypass</button>
+        <button onclick="switchTab(1,this)">Lua Obfuscator</button>
+        <button onclick="switchTab(2,this)">Steam Tools</button>
+        <button onclick="switchTab(3,this)">Stats</button>
+    </div>
+    
+    <div class="tab-content active" id="tab0">
+        <h1>Link Bypasser</h1>
+        <p class="sub">Paste your link to get started</p>
+        <input type="text" id="bpUrl" placeholder="Paste link here...">
+        <button class="btn" id="bpBtn" onclick="doBypass()">Bypass</button>
+        <div class="result-box" id="bpBox">
+            <pre id="bpResult"></pre>
+            <div class="btns">
+                <button class="btn small" onclick="copyById('bpResult')">Copy</button>
+                <button class="btn small" onclick="openUrl(document.getElementById('bpResult').textContent)">Open</button>
             </div>
         </div>
-        
-        <!-- OBFUSCATOR TAB -->
-        <div class="tab-content" id="tab2">
-            <h1>Lua Obfuscator</h1>
-            <p class="sub">Paste your Lua code to obfuscate</p>
-            <textarea id="obfInput" placeholder="Paste your Lua code here..." spellcheck="false"></textarea>
-            <button class="btn" id="obfBtn">Obfuscate</button>
-            <div class="result-box" id="obfResultBox">
-                <pre id="obfResultText"></pre>
-                <div class="btns">
-                    <button class="btn small" id="obfCopyBtn">Copy</button>
-                    <button class="btn small" id="obfDownloadBtn">Download</button>
-                </div>
+    </div>
+    
+    <div class="tab-content" id="tab1">
+        <h1>Lua Obfuscator</h1>
+        <p class="sub">Paste your Lua code to obfuscate</p>
+        <textarea id="obfInput" placeholder="Paste your Lua code here..."></textarea>
+        <button class="btn" onclick="doObfuscate()">Obfuscate</button>
+        <div class="result-box" id="obfBox">
+            <pre id="obfResult"></pre>
+            <div class="btns">
+                <button class="btn small" onclick="copyById('obfResult')">Copy</button>
+                <button class="btn small" onclick="downloadFile('obfuscated.lua',document.getElementById('obfResult').textContent)">Download</button>
             </div>
         </div>
     </div>
 
-    <script>
-    (function() {
-        // ===== PROTEÇÃO =====
-        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-        document.addEventListener('keydown', function(e) {
-            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
-                e.preventDefault();
-            }
-        });
-        setInterval(function() {
-            if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
-                document.body.innerHTML = '';
-                window.location.replace('about:blank');
-            }
-        }, 1000);
+    <div class="tab-content" id="tab2">
+        <h1>🛠️ Steam Tools</h1>
+        <p class="sub">Downloads for Steam</p>
+        <div class="download-card">
+            <div class="d-icon">
+                <img src="https://files.catbox.moe/iqsslg.png" alt="Millennium" onerror="this.style.display='none';this.parentElement.innerHTML='🌙';this.parentElement.style.fontSize='35px'">
+            </div>
+            <h2>Millennium</h2>
+            <p style="color:#666;font-size:12px;margin-bottom:3px">Steam Client Customization Tool</p>
+            <p style="color:#555;font-size:11px;margin-bottom:5px">Custom themes, plugins & more</p>
+            <p class="ver">Windows Installer</p>
+            <a href="https://github.com/SteamClientHomebrew/Millennium/releases/latest/download/MillenniumInstaller-Windows.exe" class="d-btn" target="_blank" onclick="trackDownload('Millennium')">⬇ Download</a>
+        </div>
+    </div>
 
-        // ===== TABS =====
-        document.getElementById('tabBtn1').onclick = function() {
-            this.classList.add('active');
-            document.getElementById('tabBtn2').classList.remove('active');
-            document.getElementById('tab1').classList.add('active');
-            document.getElementById('tab2').classList.remove('active');
-        };
-        document.getElementById('tabBtn2').onclick = function() {
-            this.classList.add('active');
-            document.getElementById('tabBtn1').classList.remove('active');
-            document.getElementById('tab2').classList.add('active');
-            document.getElementById('tab1').classList.remove('active');
-        };
+    <div class="tab-content" id="tab3">
+        <h1>📊 Live Stats</h1>
+        <p class="sub">Real-time site analytics</p>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="number" id="totalVisits">0</div><div class="label">Total Visits</div></div>
+            <div class="stat-card blue"><div class="number" id="uniqueIPs">0</div><div class="label">Unique IPs</div></div>
+            <div class="stat-card purple"><div class="number" id="totalBypass">0</div><div class="label">Bypasses</div></div>
+            <div class="stat-card gold"><div class="number" id="totalObfuscations">0</div><div class="label">Obfuscations</div></div>
+        </div>
+        <div style="background:#050505;border:1px solid #1a1a1a;border-radius:10px;padding:15px;margin-bottom:10px">
+            <div class="stat-row"><span>👤 Your IP</span><span id="yourIP">Loading...</span></div>
+            <div class="stat-row"><span>🕐 Online Now</span><span><span class="live-dot"></span> <span id="onlineNow">0</span></span></div>
+            <div class="stat-row"><span>📅 Today</span><span id="todayVisits">0</span></div>
+            <div class="stat-row"><span>🌍 Country</span><span id="yourCountry">Loading...</span></div>
+            <div class="stat-row"><span>📥 Downloads</span><span id="totalDownloads">0</span></div>
+        </div>
+        <h3 style="color:#555;font-size:11px;margin-bottom:8px;text-align:center">Recent Visitors</h3>
+        <div class="visitor-list" id="visitorList"></div>
+        <button class="btn" onclick="resetStats()" style="margin-top:15px;font-size:11px;background:#1a0a0a;border-color:#1a0000;color:#944">Reset Stats</button>
+    </div>
+</div>
 
-        // ===== BYPASS =====
-        document.getElementById('bpBtn').onclick = function() {
-            var url = document.getElementById('bpUrl').value.trim();
-            if (!url) return;
-            
-            var btn = this;
-            btn.disabled = true;
-            btn.textContent = 'Processing...';
-            document.getElementById('bpResultBox').classList.remove('show');
-            
-            fetch('https://trw.lat/api/bypass?apikey=TRW_FREE-GAY-15a92945-9b04-4c75-8337-f2a6007281e9&url=' + encodeURIComponent(url))
-                .then(function(r) { return r.json(); })
-                .then(function(d) {
-                    if (d.success && d.result) {
-                        var clean = d.result;
-                        if (typeof clean === 'string') {
-                            clean = clean.replace(/^\(['"](.+?)['"],\s*(True|False)\)$/, '$1');
-                            clean = clean.replace(/^["'](.+?)["']$/, '$1');
-                        }
-                        document.getElementById('bpResultText').textContent = clean;
-                        document.getElementById('bpResultBox').classList.add('show');
-                    }
-                })
-                .catch(function() {
-                    document.getElementById('bpResultText').textContent = 'Error connecting';
-                    document.getElementById('bpResultBox').classList.add('show');
-                })
-                .finally(function() {
-                    btn.disabled = false;
-                    btn.textContent = 'Bypass';
-                });
-        };
+<!-- Google reCAPTCHA v2 -->
+<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
 
-        document.getElementById('bpCopyBtn').onclick = function() {
-            copyText(document.getElementById('bpResultText').textContent, this);
-        };
+<script>
+// SUA SITE KEY DO GOOGLE reCAPTCHA AQUI
+var RECAPTCHA_SITE_KEY = '6LeZJxwtAAAAAAuYRfti8YVg8YUBRh1xfAqt7PMd'; // Chave de teste do Google (sempre passa)
 
-        document.getElementById('bpOpenBtn').onclick = function() {
-            var url = document.getElementById('bpResultText').textContent;
-            if (url && url.indexOf('http') === 0) window.open(url, '_blank');
-        };
+// Se já verificou, pula
+if (localStorage.getItem('ux_verified') === 'true') {
+    showMain();
+}
 
-        document.getElementById('bpUrl').onkeypress = function(e) {
-            if (e.key === 'Enter') document.getElementById('bpBtn').click();
-        };
-
-        // ===== OBFUSCATOR =====
-        document.getElementById('obfBtn').onclick = function() {
-            var code = document.getElementById('obfInput').value.trim();
-            if (!code) return;
-            
-            // Remove comments
-            code = code.replace(/--\[\[[\s\S]*?\]\]/g, '');
-            code = code.replace(/--[^\n]*/g, '');
-            
-            // Rename local vars
-            var reserved = ['nil','true','false','and','or','not','local','function','if','then','else','elseif','end','for','while','do','repeat','until','return','break','in','goto'];
-            var localRegex = /\blocal\s+([a-zA-Z_][a-zA-Z0-9_]*)/g;
-            var match;
-            var varMap = {};
-            
-            while ((match = localRegex.exec(code)) !== null) {
-                if (reserved.indexOf(match[1]) === -1 && match[1].length > 1 && !varMap[match[1]]) {
-                    varMap[match[1]] = randomStr(10);
+window.onRecaptchaLoad = function() {
+    if (typeof grecaptcha !== 'undefined') {
+        try {
+            grecaptcha.render('recaptchaBox', {
+                sitekey: RECAPTCHA_SITE_KEY,
+                theme: 'dark',
+                callback: function(token) {
+                    localStorage.setItem('ux_verified', 'true');
+                    showMain();
+                },
+                'expired-callback': function() {
+                    grecaptcha.reset();
                 }
-            }
-            
-            for (var old in varMap) {
-                var safe = old.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                code = code.replace(new RegExp('\\b' + safe + '\\b', 'g'), varMap[old]);
-            }
-            
-            // Convert to bytes
-            var bytes = [];
-            for (var i = 0; i < code.length; i++) {
-                bytes.push('\\' + code.charCodeAt(i));
-            }
-            var encoded = bytes.join('');
-            
-            // Split into chunks
-            var chunks = [];
-            for (var i = 0; i < encoded.length; i += 50) {
-                chunks.push('"' + encoded.substring(i, Math.min(i + 50, encoded.length)) + '"');
-            }
-            
-            // Generate var names
-            var v1 = 't' + randomStr(6);
-            var v2 = 'r' + randomStr(6);
-            var v3 = 'i' + randomStr(6);
-            var v4 = 'f' + randomStr(5);
-            
-            // Build result
-            var result = 'local ' + v1 + '={' + chunks.join(';') + '}\n';
-            result += 'local ' + v2 + '=""\n';
-            result += 'for ' + v3 + '=1,#' + v1 + ' do ' + v2 + '=' + v2 + '..' + v1 + '[' + v3 + '] end\n';
-            result += 'local ' + v4 + '=loadstring(' + v2 + ')\n';
-            result += v4 + '()';
-            
-            document.getElementById('obfResultText').textContent = result;
-            document.getElementById('obfResultBox').classList.add('show');
-        };
-
-        document.getElementById('obfCopyBtn').onclick = function() {
-            copyText(document.getElementById('obfResultText').textContent, this);
-        };
-
-        document.getElementById('obfDownloadBtn').onclick = function() {
-            var text = document.getElementById('obfResultText').textContent;
-            if (!text) return;
-            var blob = new Blob([text], { type: 'text/plain' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'obfuscated.lua';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        };
-
-        // ===== UTILS =====
-        function randomStr(len) {
-            var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            var str = '';
-            for (var i = 0; i < len; i++) str += chars.charAt(Math.floor(Math.random() * chars.length));
-            return str;
+            });
+        } catch(e) {
+            console.log('reCAPTCHA error, showing site directly');
+            showMain();
         }
+    } else {
+        showMain();
+    }
+};
 
-        function copyText(text, btn) {
-            if (!text) return;
-            var ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed';
-            ta.style.left = '-9999px';
-            ta.style.top = '0';
-            document.body.appendChild(ta);
-            ta.focus();
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            
-            var orig = btn.textContent;
-            btn.textContent = 'Copied!';
-            btn.classList.add('copied');
-            setTimeout(function() {
-                btn.textContent = orig;
-                btn.classList.remove('copied');
-            }, 1500);
+// Fallback: se reCAPTCHA não carregar em 8 segundos, mostra o site
+setTimeout(function() {
+    if (!localStorage.getItem('ux_verified')) {
+        showMain();
+    }
+}, 8000);
+
+function showMain() {
+    document.getElementById('verifyScreen').classList.remove('show');
+    document.getElementById('mainBox').classList.add('show');
+    initSite();
+}
+
+// ===== SITE =====
+function initSite() {
+    var stats = JSON.parse(localStorage.getItem('ux_stats') || '{"visits":0,"ips":{},"bypasses":0,"obfuscations":0,"downloads":0,"visitors":[],"today":"' + new Date().toDateString() + '","todayCount":0}');
+    if (stats.today !== new Date().toDateString()) { stats.today = new Date().toDateString(); stats.todayCount = 0; }
+
+    fetch('https://api.ipify.org?format=json')
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+            document.getElementById('yourIP').textContent = d.ip;
+            return fetch('https://ipapi.co/' + d.ip + '/country_name/');
+        })
+        .then(function(r) { return r.text(); })
+        .then(function(country) {
+            document.getElementById('yourCountry').textContent = country || 'Unknown';
+        })
+        .catch(function() {
+            document.getElementById('yourIP').textContent = 'Unknown';
+            document.getElementById('yourCountry').textContent = 'Unknown';
+        });
+
+    stats.visits++; stats.todayCount++;
+    saveStats(); updateStatsDisplay();
+
+    function saveStats() { localStorage.setItem('ux_stats', JSON.stringify(stats)); }
+    function updateStatsDisplay() {
+        document.getElementById('totalVisits').textContent = stats.visits;
+        document.getElementById('uniqueIPs').textContent = Object.keys(stats.ips).length;
+        document.getElementById('totalBypass').textContent = stats.bypasses;
+        document.getElementById('totalObfuscations').textContent = stats.obfuscations;
+        document.getElementById('todayVisits').textContent = stats.todayCount;
+        document.getElementById('totalDownloads').textContent = stats.downloads;
+        var fiveMinAgo = Date.now() - (5 * 60 * 1000);
+        document.getElementById('onlineNow').textContent = stats.visitors.filter(function(v) { return v.timestamp > fiveMinAgo; }).length;
+        var listHtml = '';
+        for (var i = 0; i < Math.min(stats.visitors.length, 10); i++) {
+            var v = stats.visitors[i];
+            listHtml += '<div class="visitor-item"><span>' + v.ip + ' (' + v.country + ')</span><span>' + v.time + '</span></div>';
         }
-    })();
-    </script>
+        document.getElementById('visitorList').innerHTML = listHtml || '<p style="color:#444;text-align:center;font-size:10px">No visitors yet</p>';
+    }
+
+    window.trackDownload = function() { stats.downloads++; saveStats(); updateStatsDisplay(); };
+    window.resetStats = function() {
+        if (confirm('Reset all stats?')) {
+            stats = {visits:0,ips:{},bypasses:0,obfuscations:0,downloads:0,visitors:[],today:new Date().toDateString(),todayCount:0};
+            saveStats(); updateStatsDisplay();
+        }
+    };
+
+    window.doBypass = function() {
+        var url = document.getElementById('bpUrl').value.trim();
+        if (!url) return;
+        var btn = document.getElementById('bpBtn');
+        btn.disabled = true; btn.textContent = 'Processing...';
+        document.getElementById('bpBox').classList.remove('show');
+        fetch('https://trw.lat/api/bypass?apikey=TRW_FREE-GAY-15a92945-9b04-4c75-8337-f2a6007281e9&url=' + encodeURIComponent(url))
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                if (d.success && d.result) {
+                    var c = d.result;
+                    if (typeof c === 'string') { c = c.replace(/^\(['"](.+?)['"],\s*(True|False)\)$/, '$1'); c = c.replace(/^["'](.+?)["']$/, '$1'); }
+                    document.getElementById('bpResult').textContent = c;
+                    document.getElementById('bpBox').classList.add('show');
+                    stats.bypasses++; saveStats(); updateStatsDisplay();
+                }
+            })
+            .catch(function() { document.getElementById('bpResult').textContent = 'Error'; document.getElementById('bpBox').classList.add('show'); })
+            .finally(function() { btn.disabled = false; btn.textContent = 'Bypass'; });
+    };
+
+    window.doObfuscate = function() {
+        var code = document.getElementById('obfInput').value.trim();
+        if (!code) return;
+        code = code.replace(/--\[\[[\s\S]*?\]\]/g, '').replace(/--[^\n]*/g, '');
+        var res = ['nil','true','false','and','or','not','local','function','if','then','else','elseif','end','for','while','do','repeat','until','return','break','in','goto'];
+        var lr = /\blocal\s+([a-zA-Z_][a-zA-Z0-9_]*)/g, m, vm = {};
+        while ((m = lr.exec(code)) !== null) { if (res.indexOf(m[1]) === -1 && m[1].length > 1 && !vm[m[1]]) vm[m[1]] = rnd(10); }
+        for (var o in vm) { var s = o.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); code = code.replace(new RegExp('\\b' + s + '\\b', 'g'), vm[o]); }
+        var by = []; for (var i = 0; i < code.length; i++) by.push('\\' + code.charCodeAt(i));
+        var en = by.join(''), ch = [];
+        for (var i = 0; i < en.length; i += 50) ch.push('"' + en.substring(i, Math.min(i+50, en.length)) + '"');
+        var v1='t'+rnd(6), v2='r'+rnd(6), v3='i'+rnd(6), v4='f'+rnd(5);
+        var r = 'local '+v1+'={'+ch.join(';')+'}\nlocal '+v2+'=""\nfor '+v3+'=1,#'+v1+' do '+v2+'='+v2+'..'+v1+'['+v3+'] end\nlocal '+v4+'=loadstring('+v2+')\n'+v4+'()';
+        document.getElementById('obfResult').textContent = r;
+        document.getElementById('obfBox').classList.add('show');
+        stats.obfuscations++; saveStats(); updateStatsDisplay();
+    };
+
+    updateStatsDisplay();
+}
+
+function switchTab(n, btn) {
+    document.querySelectorAll('.tabs button').forEach(function(b, i) { b.classList.toggle('active', i === n); });
+    document.querySelectorAll('.tab-content').forEach(function(t, i) { t.classList.toggle('active', i === n); });
+}
+
+function rnd(l) { var c='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',s=''; for(var i=0;i<l;i++)s+=c.charAt(Math.floor(Math.random()*c.length)); return s; }
+function copyById(id) { var t=document.getElementById(id).textContent; if(!t)return; var ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+function openUrl(u) { if(u&&u.indexOf('http')===0)window.open(u,'_blank'); }
+function downloadFile(name,text) { if(!text)return; var b=new Blob([text],{type:'text/plain'}); var u=URL.createObjectURL(b); var a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); }
+</script>
 </body>
 </html>
